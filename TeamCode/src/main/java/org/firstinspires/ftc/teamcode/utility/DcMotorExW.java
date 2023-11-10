@@ -9,11 +9,11 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-public class myDcMotorEx implements DcMotorEx {
+public class DcMotorExW implements DcMotorEx {
     private final DcMotorEx motor;
     private double lastPower = 0, powerStep = 0, minimum_power = 0;
 
-    public myDcMotorEx(DcMotorEx motor){
+    public DcMotorExW(DcMotorEx motor){
         this.motor = motor;
     }
 

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.utility;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class myElapsedTime extends ElapsedTime {
+public class ElapsedTimeW extends ElapsedTime {
 
     private volatile long nsPausedTime = nsNow();
     private volatile boolean isPaused = false;

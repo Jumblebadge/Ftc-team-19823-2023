@@ -10,12 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.maths.mathsOperations;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
-import org.firstinspires.ftc.teamcode.utility.myDcMotorEx;
+import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 
 public class SwerveDrive {
 
     final private IMU imu;
-    final private myDcMotorEx mod1m1,mod1m2,mod2m1,mod2m2,mod3m1,mod3m2;
+    final private DcMotorExW mod1m1,mod1m2,mod2m1,mod2m2,mod3m1,mod3m2;
     final private AnalogInput mod1E,mod2E,mod3E;
     final private Telemetry telemetry;
     final private boolean eff;
@@ -32,12 +32,12 @@ public class SwerveDrive {
     double imuOffset = 0;
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean eff){
-        mod1m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod1m1"));
-        mod1m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod1m2"));
-        mod2m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod2m1"));
-        mod2m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod2m2"));
-        mod3m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod3m1"));
-        mod3m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class,"mod3m2"));
+        mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
+        mod1m2 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m2"));
+        mod2m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod2m1"));
+        mod2m2 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod2m2"));
+        mod3m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod3m1"));
+        mod3m2 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod3m2"));
         mod1E = hardwareMap.get(AnalogInput.class, "mod1E");
         mod2E = hardwareMap.get(AnalogInput.class, "mod2E");
         mod3E = hardwareMap.get(AnalogInput.class, "mod3E");

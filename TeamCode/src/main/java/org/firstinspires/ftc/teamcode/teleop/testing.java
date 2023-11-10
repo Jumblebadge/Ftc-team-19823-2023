@@ -8,15 +8,15 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.LinearSlide;
+import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-    public static boolean activateSlides = false;
-    public static double slideTarget = 0;
+    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, target = 0;
+    public static boolean p = false;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -24,9 +24,9 @@ public class testing extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        //class that runs our linear slide
-        LinearSlide slide = new LinearSlide(hardwareMap);
-        slide.resetEncoders();
+        Deposit deposit = new Deposit(hardwareMap);
+
+        ButtonDetector game2b = new ButtonDetector();
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -43,14 +43,22 @@ public class testing extends LinearOpMode {
             controlHub.clearBulkCache();
 
 
-            if (activateSlides) {
-                slide.update();
+            if (gamepad1.x) {
+                game2b.toFalse();
+                deposit.transfer();
+            }
+            else if (gamepad1.a) {
+                game2b.toFalse();
+                deposit.mid();
+            }
+            else if (game2b.toggle(gamepad1.b)) {
+                deposit.score(gamepad1.right_stick_y);
             }
 
+            telemetry.addData("target",target);
+            telemetry.addData("state",deposit.endPosition());
 
-            slide.moveTo(slideTarget);
-            telemetry.addData("slide",-slide.getPosition());
-            telemetry.addData("slidetar",slide.getMotionTarget());
+            deposit.update();
             telemetry.update();
         }
     }

@@ -4,12 +4,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.teamcode.utility.TwoServo;
+import org.firstinspires.ftc.teamcode.utility.DualServo;
 
 public class Swing {
 
     public static final double score = 0.5, init = 0.5, transfer = 0.5;
-    private final TwoServo swing;
+    private final DualServo swing;
 
     public Swing(HardwareMap hardwareMap) {
         ServoImplEx swingL = hardwareMap.get(ServoImplEx.class, "swingL");
@@ -18,7 +18,7 @@ public class Swing {
         swingL.setPwmRange(new PwmControl.PwmRange(500, 2500));
         swingR.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        swing = new TwoServo(swingL, swingR);
+        swing = new DualServo(swingL, swingR);
     }
 
     public void moveTo(double target) {

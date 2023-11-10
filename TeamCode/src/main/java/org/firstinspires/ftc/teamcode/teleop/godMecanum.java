@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Blinkin;
+import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
@@ -19,6 +20,8 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 @TeleOp(name="mecnuemaen", group="Linear Opmode")
 public class godMecanum extends LinearOpMode {
 
+    // p6, i15, l0.1
+
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
@@ -27,9 +30,9 @@ public class godMecanum extends LinearOpMode {
 
         //class to swerve the mecanum
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap);
-        Blinkin blinkin = new Blinkin(hardwareMap);
+        Deposit deposit = new Deposit(hardwareMap);
 
-        blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_RAINBOW_PALETTE);
+        ButtonDetector game2b = new ButtonDetector();
 
         ElapsedTime hztimer = new ElapsedTime();
 
@@ -43,7 +46,19 @@ public class godMecanum extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
-            drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, Math.pow(gamepad1.right_stick_x,3));
+
+            if (gamepad1.x) {
+                game2b.toFalse();
+                deposit.transfer();
+            }
+            else if (gamepad1.a) {
+                game2b.toFalse();
+                deposit.mid();
+            }
+            else if (game2b.toggle(gamepad1.b)) {
+                deposit.score(gamepad1.right_stick_y);
+            }
 
             telemetry.addData("hz",1/hztimer.seconds());
             hztimer.reset();

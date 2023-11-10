@@ -4,13 +4,13 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
-public class TwoServo {
+public class DualServo {
 
     private final ServoImplEx servo1, servo2;
     private final RunMotionProfile profile = new RunMotionProfile(0.1,0.1,0.1,0,0,0,0, 100);
     private double lastTarget;
 
-    public TwoServo(ServoImplEx servo2, ServoImplEx servo1){
+    public DualServo(ServoImplEx servo2, ServoImplEx servo1){
         this.servo1 = servo1;
         this.servo2 = servo2;
     }
@@ -41,7 +41,7 @@ public class TwoServo {
         return profile.getMotionTarget();
     }
 
-    public double getBucketPosition(){
+    public double getPosition(){
         return servo2.getPosition();
     }
 
