@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility;
 
+import java.util.TreeMap;
+
 public class ButtonDetector {
 
     public boolean current = false;
@@ -23,5 +25,7 @@ public class ButtonDetector {
     public void toFalse() {
         current = false;
     }
+
+    public void toTrue()  { current = true;  }
 }
 

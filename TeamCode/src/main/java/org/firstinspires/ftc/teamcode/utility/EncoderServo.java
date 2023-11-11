@@ -6,14 +6,16 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.maths.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class EncoderServo {
 
     private final CRServoImplEx servo;
     private final AnalogInput encoder;
+    private final SlewRateLimiter slew = new SlewRateLimiter();
     private final PIDcontroller PID = new PIDcontroller(0.05,0.00002,2,0,0.1);
-    private double target;
+    private double target, r = 5;
 
     public EncoderServo(CRServoImplEx servo, AnalogInput encoder){
         this.servo = servo;
@@ -40,8 +42,14 @@ public class EncoderServo {
         target = position;
     }
 
-    public void update() {
-        servo.setPower(PID.pidOut(AngleUnit.normalizeDegrees(target - getPosition())));
+    public void update(boolean reversed) {
+        double PIDout = PID.pidOut(AngleUnit.normalizeDegrees(target - getPosition()));
+        double limited = slew.rateLimit((reversed) ? -PIDout : PIDout,r);
+        servo.setPower(limited);
+    }
+
+    public void setR(double r){
+        this.r = r;
     }
 
 }

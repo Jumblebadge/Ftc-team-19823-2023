@@ -16,9 +16,8 @@ public class LinearSlide {
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double highPole = 800, mediumPole = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
+    public static final double high = 800, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
     double currentHeight = zero, offset = 0;
-    final double alignerDown = 0.5, alignerUp = 0.8;
 
     public LinearSlide(HardwareMap hardwareMap){
         DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");
@@ -79,10 +78,24 @@ public class LinearSlide {
         this.offset = offset;
     }
 
-
-    public void zero(boolean override){
+    public void zero(){
         moveTo(zero);
         currentHeight = zero;
+    }
+
+    public void transfer(){
+        moveTo(transfer);
+        currentHeight = transfer;
+    }
+
+    public void mid(){
+        moveTo(mid);
+        currentHeight = mid;
+    }
+
+    public void high(){
+        moveTo(high);
+        currentHeight = high;
     }
 
     public double returnPole() {

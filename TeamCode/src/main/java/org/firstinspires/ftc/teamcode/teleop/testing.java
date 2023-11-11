@@ -15,8 +15,7 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, target = 0;
-    public static boolean p = false;
+    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, target = 0.5, r = 1000;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -24,7 +23,7 @@ public class testing extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        Deposit deposit = new Deposit(hardwareMap);
+        Deposit deposit = new Deposit(hardwareMap, telemetry);
 
         ButtonDetector game2b = new ButtonDetector();
 
@@ -36,6 +35,8 @@ public class testing extends LinearOpMode {
 
         //Initialize FTCDashboard telemetry
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        deposit.mid();
 
         waitForStart();
         while (opModeIsActive()) {
@@ -56,9 +57,11 @@ public class testing extends LinearOpMode {
             }
 
             telemetry.addData("target",target);
+            telemetry.addData("dame",game2b.toggle(gamepad1.b));
             telemetry.addData("state",deposit.endPosition());
 
             deposit.update();
+            deposit.setR(r);
             telemetry.update();
         }
     }
