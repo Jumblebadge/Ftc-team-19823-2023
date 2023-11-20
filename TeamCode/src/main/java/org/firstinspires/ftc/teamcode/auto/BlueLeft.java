@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,8 +19,8 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 
 @Config
-@TeleOp(name="mecnuemaen", group="Linear Opmode")
-public class godMecanum extends LinearOpMode {
+@Autonomous(name="BlueLeft", group="Linear Opmode")
+public class BlueLeft extends LinearOpMode {
 
     private double heading = 0, rotation = 0;
 
@@ -34,13 +35,8 @@ public class godMecanum extends LinearOpMode {
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
 
-        ButtonDetector game2dl  = new ButtonDetector();
-        ButtonDetector game2rb  = new ButtonDetector();
-        ButtonDetector game1a   = new ButtonDetector();
-        ButtonDetector game1rb  = new ButtonDetector();
-        ButtonDetector game1lb  = new ButtonDetector();
-
         ElapsedTime hztimer = new ElapsedTime();
+        ElapsedTime timer = new ElapsedTime();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
@@ -50,53 +46,25 @@ public class godMecanum extends LinearOpMode {
         //deposit.transfer();
 
         waitForStart();
+        timer.reset();
         while (opModeIsActive()) {
 
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
-            //driving gamepad
+            rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
 
-            if (game1a.toggle(gamepad1.a)) {
-                rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
+            if (timer.seconds() < 0.45) {
+                drive.drive(-0.5, 0, rotation);
             }
-            else { rotation = 0; }
-
-            if (game1rb.risingEdge(gamepad1.right_bumper)) {
-                heading = drive.getHeading();
+            else if (timer.seconds() < 3) {
+                drive.drive(-0, 0.5, rotation);
             }
-
-            if (game1lb.risingEdge(gamepad1.left_bumper)) {
-                heading = 0;
-                game1a.toTrue();
+            else if (timer.seconds() > 3) {
+                heading = -90;
+                drive.drive(0,0,rotation);
             }
 
-            drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
-
-            //subsystem gamepad
-            /**
-            if (gamepad2.dpad_right) {
-                game2dl.toFalse();
-                deposit.transfer();
-            }
-            else if (gamepad2.dpad_down) {
-                game2dl.toFalse();
-                deposit.mid();
-            }
-            else if (game2dl.toggle(gamepad2.b)) {
-                deposit.score(gamepad1.right_stick_y);
-            }
-
-            if (game2rb.toggle(gamepad2.right_bumper)) {
-                intake.on();
-            }
-            else if (gamepad1.left_bumper) {
-                intake.eject();
-            }
-            else {
-                intake.off();
-            }
-            **/
             telemetry.addData("hz",1/hztimer.seconds());
             hztimer.reset();
             telemetry.update();
