@@ -2,18 +2,16 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.maths.Bezier;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
-import org.firstinspires.ftc.teamcode.subsystems.Blinkin;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 
@@ -22,7 +20,6 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 public class godMecanum extends LinearOpMode {
 
     private double heading = 0, rotation = 0;
-
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 

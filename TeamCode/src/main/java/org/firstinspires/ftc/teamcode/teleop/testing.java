@@ -23,9 +23,7 @@ public class testing extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        Deposit deposit = new Deposit(hardwareMap, telemetry);
 
-        ButtonDetector game2b = new ButtonDetector();
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -36,32 +34,16 @@ public class testing extends LinearOpMode {
         //Initialize FTCDashboard telemetry
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        deposit.mid();
-
         waitForStart();
         while (opModeIsActive()) {
 
             controlHub.clearBulkCache();
 
 
-            if (gamepad1.x) {
-                game2b.toFalse();
-                deposit.transfer();
-            }
-            else if (gamepad1.a) {
-                game2b.toFalse();
-                deposit.mid();
-            }
-            else if (game2b.toggle(gamepad1.b)) {
-                deposit.score(gamepad1.right_stick_y);
-            }
 
             telemetry.addData("target",target);
-            telemetry.addData("dame",game2b.toggle(gamepad1.b));
-            telemetry.addData("state",deposit.endPosition());
 
-            deposit.update();
-            deposit.setR(r);
+
             telemetry.update();
         }
     }
