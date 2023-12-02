@@ -13,9 +13,6 @@ public class MecanumDrive {
     final private DcMotorExW frontRight, frontLeft, backLeft, backRight;
     final private Telemetry telemetry;
 
-    double heading;
-    double imuOffset = 0;
-
     public MecanumDrive(Telemetry telemetry, HardwareMap hardwareMap){
         frontRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontRight"));
         frontLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontLeft"));
@@ -38,7 +35,7 @@ public class MecanumDrive {
     public void drive(double x, double y, double rot){
 
         //Update heading of robot
-        heading = imu.getHeadingInDegrees();
+        double heading = imu.getHeadingInDegrees();
 
         double x1 = Math.cos(Math.toRadians(heading)) * x - Math.sin(Math.toRadians(heading)) * -y;
         double y1 = Math.sin(Math.toRadians(heading)) * x + Math.cos(Math.toRadians(heading)) * -y;
@@ -52,10 +49,6 @@ public class MecanumDrive {
 
         telemetry.addData("imu", imu.getHeadingInDegrees());
 
-    }
-
-    public void rotateKids(double angle) {
-        this.imuOffset = angle;
     }
 
     public void resetIMU() {

@@ -24,7 +24,7 @@ public class Deposit {
     public static final Point score = new Point(45,0.22), mid = new Point(165,0.5), transfer = new Point(-45, 0.61);
     private final DualServo swing;
     private final EncoderServo end;
-    Telemetry telemetry;
+    private final Telemetry telemetry;
     private Point target, current = mid;
 
     public Deposit(HardwareMap hardwareMap, Telemetry telemetry) {

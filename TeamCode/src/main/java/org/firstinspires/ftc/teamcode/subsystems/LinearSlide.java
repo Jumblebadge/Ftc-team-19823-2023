@@ -17,7 +17,7 @@ public class LinearSlide {
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
     public static final double high = 800, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
-    double currentHeight = zero, offset = 0;
+    private double currentHeight = zero, offset = 0;
 
     public LinearSlide(HardwareMap hardwareMap){
         DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");

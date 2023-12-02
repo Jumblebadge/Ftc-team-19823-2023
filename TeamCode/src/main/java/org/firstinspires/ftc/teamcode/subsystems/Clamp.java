@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.utility.ServoGroup;
 
 public class Clamp {
 
-    public final ServoGroup clamp;
+    private final ServoGroup clamp;
     public final double score = 0.5, transfer = 0.5, init = 0.5;
 
     public Clamp(HardwareMap hardwareMap){

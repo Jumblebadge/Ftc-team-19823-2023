@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 public class Plane {
 
     private final ServoImplEx plane;
-    private final double hold = 0.5, release = 0.5;
+    public final double hold = 0.5, release = 0.5;
 
     public Plane(HardwareMap hardwareMap){
         plane = hardwareMap.get(ServoImplEx.class, "plane");

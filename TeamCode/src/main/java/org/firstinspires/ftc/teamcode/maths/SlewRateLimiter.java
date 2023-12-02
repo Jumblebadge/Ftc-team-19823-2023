@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class SlewRateLimiter {
 
-    ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
     private double output = 0;
 
     public double rateLimit(double input, double r){

@@ -25,11 +25,9 @@ public class SwerveDrive {
     private final PIDcontroller mod3PID = new PIDcontroller(0.1,0.002,1,0.5, 0.75);
     private final swerveKinematics swavemath = new swerveKinematics();
 
-    double mod1reference = 0;
-    double mod2reference = 0;
-    double mod3reference = 0;
-    double heading;
-    double imuOffset = 0;
+    private double mod1reference = 0;
+    private double mod2reference = 0;
+    private double mod3reference = 0;
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean eff){
         mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
@@ -66,10 +64,10 @@ public class SwerveDrive {
         double mod3P = mod3E.getVoltage() * 74.16;
 
         //Update heading of robot
-        heading = imu.getHeadingInDegrees();
+        double heading = imu.getHeadingInDegrees();
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(y,-x,-rot,heading,true);
+        double[] output = swavemath.calculate(y,-x,-rot, heading,true);
         double mod1power = output[0];
         double mod3power = output[1];
         double mod2power = output[2];
@@ -129,10 +127,6 @@ public class SwerveDrive {
         telemetry.addData("mod1P",mod1P);
         telemetry.addData("mod2P",mod2P);
         telemetry.addData("mod3P",mod3P);
-    }
-
-    public void rotateKids(double angle) {
-        this.imuOffset = angle;
     }
 
     public void resetIMU() {
