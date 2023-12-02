@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.maths;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+
 public class mathsOperations {
 
     //normalizes the angle given
@@ -68,10 +70,7 @@ public class mathsOperations {
     }
 
     public static boolean equals(double state, double equals, double thresh){
-        if (Math.abs(state - equals) < thresh){
-            return true;
-        }
-        return false;
+        return Math.abs(state - equals) < thresh;
     }
 
     public static double power(double x, double pow) {
@@ -79,5 +78,12 @@ public class mathsOperations {
             x *= x;
         }
         return x;
+    }
+
+    public static Vector2d interpolate(Vector2d start, Vector2d end, double midy){
+        double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
+        double b = -(m*start.getX()) + start.getY();
+
+        return new Vector2d((midy - b) / m, midy);
     }
 }

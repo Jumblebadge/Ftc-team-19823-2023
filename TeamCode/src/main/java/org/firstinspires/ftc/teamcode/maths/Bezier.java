@@ -54,15 +54,20 @@ public class Bezier {
 
     public double getTotalArcLength() {
         double total = 0;
-        for (double i = 0; i <= 12; i++) {
-            total += getPoint(i / 12).distTo(getPoint(i / 12 + 1));
+        for (double i = 0; i <= 15; i++) {
+            total += getPoint(i / 15).distTo(getPoint((i + 1)/ 15));
         }
         return total;
     }
 
-    //TODO fix these 2
     public double getArcLength(double T) {
-        return 3;
+        double total = 0;
+        for (double i = 0; i <= 15; i++) {
+            if(i / 15 < T) {
+                total += getPoint(i / 15).distTo(getPoint((i + 1)/ 15));
+            }
+        }
+        return total;
     }
 
     public double distanceToT(double distance) {
