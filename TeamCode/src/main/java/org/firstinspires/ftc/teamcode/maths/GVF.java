@@ -8,8 +8,12 @@ public class GVF {
     Vector2d R, closestPoint;
     double Kn;
 
-    public GVF (CubicPath path, double Kn) {
+    public GVF(CubicPath path, double Kn) {
         this.path = path;
+        this.Kn = Kn;
+    }
+
+    public void setKn(double Kn) {
         this.Kn = Kn;
     }
 
@@ -27,7 +31,10 @@ public class GVF {
         Vector2d tangent = path.getNormalizedTangent(path.guessT);
         Vector2d normal = path.getNormalizedNormal(path.guessT);
         double error = calculateError();
-
+        double max = Math.max(tangent.minus(normal.times(Kn).times(error)).getX(), tangent.minus(normal.times(Kn).times(error)).getY());
+        if (max > 1) {
+            return tangent.minus(normal.times(Kn).times(error)).div(max);
+        }
         //all that work for one line LMAO
         return tangent.minus(normal.times(Kn).times(error));
     }

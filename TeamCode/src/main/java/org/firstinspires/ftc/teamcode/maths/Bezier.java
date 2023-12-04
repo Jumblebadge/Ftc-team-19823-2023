@@ -5,7 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 public class Bezier {
 
     private final Vector2d A,B,C,D;
-    public Vector2d[] lookup;
+    public Vector2d[] lookup = new Vector2d[16];
 
     public Bezier(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
         this.A = A;
@@ -69,7 +69,7 @@ public class Bezier {
 
     public double distanceToT(double distance) {
         int index = 0;
-        for (int i = 0; i <= lookup.length; i++) {
+        for (int i = 0; i < lookup.length; i++) {
             if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;
                 break;
@@ -77,6 +77,5 @@ public class Bezier {
         }
 
         return mathsOperations.interpolate(lookup[index], lookup[index + 1], distance).getX();
-
     }
 }
