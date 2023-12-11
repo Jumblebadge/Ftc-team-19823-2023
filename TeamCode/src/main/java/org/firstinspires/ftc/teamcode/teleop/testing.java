@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 import org.firstinspires.ftc.teamcode.subsystems.Blinkin;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
@@ -23,6 +24,7 @@ public class testing extends LinearOpMode {
     public static Vector2d A1 = new Vector2d(-6,0), A2 = new Vector2d(-6,4), A3 = new Vector2d(-2,4), A4 = new Vector2d(-2,0), B1 = A4, B2 = new Vector2d(-2,-4), B3 = new Vector2d(2,-4), B4 = new Vector2d(2,0), C1 = B4, C2 = new Vector2d(2,4), C3 = new Vector2d(6,4), C4 = new Vector2d(6,0);
     public static Vector2d Robot = new Vector2d(-4,4);
     public static double test = 0;
+    FtcDashboard dashboard;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -31,7 +33,9 @@ public class testing extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         CubicPath path = new CubicPath(telemetry,A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
-        GVF gvf = new GVF(path,1);
+        GVF gvf = new GVF(dashboard,path,1);
+
+        dashboard = FtcDashboard.getInstance();
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);

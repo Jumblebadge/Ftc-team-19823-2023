@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.Bezier;
+import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -19,7 +22,20 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 @TeleOp(name="mecnuemaen", group="Linear Opmode")
 public class godMecanum extends LinearOpMode {
 
+    FtcDashboard dashboard;
+    GoToPoint auto;
+
     private double heading = 0, rotation = 0;
+
+    double lastX = 0.0001, lastY = 0.0001, turretTarget = 0;
+    public static double targetX = 0, targetY = 0, targetHeading = 0;
+
+    Pose2d pose = new Pose2d(0,0,0);
+    Pose2d temp = new Pose2d(0,0,0);
+    public static Pose2d targetPose = new Pose2d(0,0,0);
+
+
+
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
@@ -27,9 +43,12 @@ public class godMecanum extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //to swerve the mecanum
-        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap);
+        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
+        auto = new GoToPoint(drive,telemetry,dashboard);
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
+
+        dashboard = FtcDashboard.getInstance();
 
         ButtonDetector game2dl  = new ButtonDetector();
         ButtonDetector game2rb  = new ButtonDetector();
@@ -68,7 +87,11 @@ public class godMecanum extends LinearOpMode {
                 game1a.toTrue();
             }
 
-            drive.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
+            //drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
+
+            pose = drive.getPose();
+            targetPose = new Pose2d(targetX,targetY,targetHeading);
+            runPoint(targetPose);
 
             //subsystem gamepad
             /**
@@ -95,8 +118,20 @@ public class godMecanum extends LinearOpMode {
             }
             **/
             telemetry.addData("hz",1/hztimer.seconds());
+            telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();
             telemetry.update();
         }
+    }
+
+    public void runPoint(Pose2d desiredPose){
+        if (lastX != desiredPose.getX() || lastY != desiredPose.getY()) {
+            lastX = desiredPose.getX();
+            lastY = desiredPose.getY();
+            temp  = new Pose2d(pose.getX(), pose.getY(),pose.getHeading());
+            auto.driveToPoint(pose,desiredPose,temp,true);
+        }
+        else{ lastX = desiredPose.getX(); lastY = desiredPose.getY(); }
+        auto.driveToPoint(pose,desiredPose,temp,false);
     }
 }

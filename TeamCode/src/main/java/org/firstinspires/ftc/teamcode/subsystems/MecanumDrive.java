@@ -1,19 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.StandardTrackingWheelLocalizer;
 
-public class MecanumDrive {
+public class MecanumDrive implements Driveable{
 
     final private IMU imu;
+    final private StandardTrackingWheelLocalizer odo;
     final private DcMotorExW frontRight, frontLeft, backLeft, backRight;
     final private Telemetry telemetry;
+    final private boolean isAuto;
 
-    public MecanumDrive(Telemetry telemetry, HardwareMap hardwareMap){
+    public MecanumDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean isAuto){
         frontRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontRight"));
         frontLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontLeft"));
         backLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"backLeft"));
@@ -29,16 +33,23 @@ public class MecanumDrive {
 
         imu = new IMU(hardwareMap);
 
+        odo = new StandardTrackingWheelLocalizer(hardwareMap);
+
         this.telemetry = telemetry;
+        this.isAuto = isAuto;
     }
 
     public void drive(double x, double y, double rot){
 
         //Update heading of robot
-        double heading = imu.getHeadingInDegrees();
+        Pose2d pose = odo.getPoseEstimate();
+        double heading;
 
-        double x1 = Math.cos(Math.toRadians(heading)) * x - Math.sin(Math.toRadians(heading)) * -y;
-        double y1 = Math.sin(Math.toRadians(heading)) * x + Math.cos(Math.toRadians(heading)) * -y;
+        if (isAuto)  heading = pose.getHeading();
+        else heading = imu.getHeadingInRadians();
+
+        double x1 = Math.cos(heading) * x - Math.sin(heading) * y;
+        double y1 = Math.sin(heading) * x + Math.cos(heading) * y;
 
         double highest = Math.max(Math.abs(x1) + Math.abs(y1) + Math.abs(rot), 1);
 
@@ -48,6 +59,9 @@ public class MecanumDrive {
         backLeft.setPower((y1 - x1 + rot)/ highest);
 
         telemetry.addData("imu", imu.getHeadingInDegrees());
+        telemetry.addData("enc1",frontRight.getCurrentPosition());
+        telemetry.addData("enc2",backRight.getCurrentPosition());
+        telemetry.addData("enc3",frontLeft.getCurrentPosition());
 
     }
 
@@ -55,8 +69,12 @@ public class MecanumDrive {
         imu.resetIMU();
     }
 
-
     public double getHeading() {
         return imu.getHeadingInDegrees();
+    }
+
+    public Pose2d getPose() {
+        odo.update();
+        return odo.getPoseEstimate();
     }
 }

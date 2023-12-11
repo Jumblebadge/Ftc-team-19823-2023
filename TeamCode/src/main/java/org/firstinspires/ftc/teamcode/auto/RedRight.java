@@ -24,7 +24,7 @@ public class RedRight extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //to swerve the mecanum
-        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap);
+        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
 
