@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
@@ -23,18 +25,9 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 public class godMecanum extends LinearOpMode {
 
     FtcDashboard dashboard;
-    GoToPoint auto;
 
-    private double heading = 0, rotation = 0;
-
-    double lastX = 0.0001, lastY = 0.0001, turretTarget = 0;
-    public static double targetX = 0, targetY = 0, targetHeading = 0;
-
-    Pose2d pose = new Pose2d(0,0,0);
-    Pose2d temp = new Pose2d(0,0,0);
-    public static Pose2d targetPose = new Pose2d(0,0,0);
-
-
+    private double rotation, heading;
+    public static double target=0, Kp=0, Kd=0, Ki=0, Kf=0, Kl=1000;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -44,11 +37,12 @@ public class godMecanum extends LinearOpMode {
 
         //to swerve the mecanum
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
-        auto = new GoToPoint(drive,telemetry,dashboard);
+        LinearSlide slide = new LinearSlide(hardwareMap);
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
         ButtonDetector game2dl  = new ButtonDetector();
         ButtonDetector game2rb  = new ButtonDetector();
@@ -64,6 +58,8 @@ public class godMecanum extends LinearOpMode {
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         //deposit.transfer();
+
+        slide.resetEncoders();
 
         waitForStart();
         while (opModeIsActive()) {
@@ -87,11 +83,11 @@ public class godMecanum extends LinearOpMode {
                 game1a.toTrue();
             }
 
-            //drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
+            drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
 
-            pose = drive.getPose();
-            targetPose = new Pose2d(targetX,targetY,targetHeading);
-            runPoint(targetPose);
+            slide.moveTo(target);
+            slide.setPIDcoeffs(Kp,Kd,Ki,Kf,Kl);
+            slide.update();
 
             //subsystem gamepad
             /**
@@ -118,20 +114,15 @@ public class godMecanum extends LinearOpMode {
             }
             **/
             telemetry.addData("hz",1/hztimer.seconds());
+            telemetry.addData("dulgk",target);
+            telemetry.addData("state",slide.getPosition());
+            telemetry.addData("essrs",slide.getError());
+            telemetry.addData("m;flj;",slide.getMotionTarget());
             telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();
             telemetry.update();
         }
     }
 
-    public void runPoint(Pose2d desiredPose){
-        if (lastX != desiredPose.getX() || lastY != desiredPose.getY()) {
-            lastX = desiredPose.getX();
-            lastY = desiredPose.getY();
-            temp  = new Pose2d(pose.getX(), pose.getY(),pose.getHeading());
-            auto.driveToPoint(pose,desiredPose,temp,true);
-        }
-        else{ lastX = desiredPose.getX(); lastY = desiredPose.getY(); }
-        auto.driveToPoint(pose,desiredPose,temp,false);
-    }
+
 }

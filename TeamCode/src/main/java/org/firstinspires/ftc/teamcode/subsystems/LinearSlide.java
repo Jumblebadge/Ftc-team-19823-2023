@@ -16,8 +16,10 @@ public class LinearSlide {
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double high = 800, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
+    public static final double high = 1700, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
     private double currentHeight = zero, offset = 0;
+
+    // 0-1680
 
     public LinearSlide(HardwareMap hardwareMap){
         DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");
@@ -30,22 +32,22 @@ public class LinearSlide {
     }
 
     public void moveTo(double target){
-        this.target = -target;
+        this.target = target;
     }
 
     public void update() {
         if (touch.isPressed()) {
             resetEncoders();
         }
-        motors.setPower(profile.profiledMovement(target, motors.getPosition(0) + offset),0);
-        motors.setPower(profile.profiledMovement(target, motors.getPosition(0) + offset),1);
+        motors.setPower(profile.profiledMovement(target, getPosition()),0);
+        motors.setPower(profile.profiledMovement(target, getPosition()),1);
     }
 
     public double getError(){
-        return target - (motors.getPosition(0) + offset);
+        return target - getPosition();
     }
 
-    public double getPosition() { return motors.getPosition(0) + offset; }
+    public double getPosition() { return -motors.getPosition(0) + offset; }
 
     public boolean isTimeDone() { return profile.getProfileDuration() < profile.getCurrentTime(); }
     public boolean isPositionDone() { return Math.abs(getError()) < 10; }
