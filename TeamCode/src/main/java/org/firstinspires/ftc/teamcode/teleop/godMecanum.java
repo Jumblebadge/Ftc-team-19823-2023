@@ -3,19 +3,15 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.maths.Bezier;
-import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
-import org.firstinspires.ftc.teamcode.subsystems.Deposit;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LinearSlide;
+import org.firstinspires.ftc.teamcode.subsystems.HorizontalSlide;
+import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
@@ -36,8 +32,8 @@ public class godMecanum extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //to swerve the mecanum
-        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
-        LinearSlide slide = new LinearSlide(hardwareMap);
+        //MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
+        HorizontalSlide slide = new HorizontalSlide(hardwareMap);
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
 
@@ -70,12 +66,12 @@ public class godMecanum extends LinearOpMode {
             //driving gamepad
 
             if (game1a.toggle(gamepad1.a)) {
-                rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
+                //rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
             }
             else { rotation = 0; }
 
             if (game1rb.risingEdge(gamepad1.right_bumper)) {
-                heading = drive.getHeading();
+                //heading = drive.getHeading();
             }
 
             if (game1lb.risingEdge(gamepad1.left_bumper)) {
@@ -83,7 +79,7 @@ public class godMecanum extends LinearOpMode {
                 game1a.toTrue();
             }
 
-            drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
+            //drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
 
             slide.moveTo(target);
             slide.setPIDcoeffs(Kp,Kd,Ki,Kf,Kl);
@@ -118,7 +114,7 @@ public class godMecanum extends LinearOpMode {
             telemetry.addData("state",slide.getPosition());
             telemetry.addData("essrs",slide.getError());
             telemetry.addData("m;flj;",slide.getMotionTarget());
-            telemetry.addData("pise",drive.getPose().toString());
+            //telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();
             telemetry.update();
         }

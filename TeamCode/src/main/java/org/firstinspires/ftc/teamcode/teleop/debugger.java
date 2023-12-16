@@ -8,8 +8,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.LinearSlide;
-import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 
 @Config
 @TeleOp(name="debugger", group="Linear Opmode")
@@ -25,7 +24,7 @@ public class debugger extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //class that runs our linear slide
-        LinearSlide slide = new LinearSlide(hardwareMap);
+        VerticalSlide slide = new VerticalSlide(hardwareMap);
         slide.resetEncoders();
 
         //Bulk sensor reads

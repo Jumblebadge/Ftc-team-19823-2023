@@ -9,26 +9,27 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.teamcode.utility.MotorGroup;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
-public class LinearSlide {
+public class HorizontalSlide {
 
+    //TODO make one motor
     private final MotorGroup motors;
     private double target;
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double high = 1700, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
-    private double currentHeight = zero, offset = 0;
+    public static final double out = 1700, mid = 300, transfer = 100, in = 0;
+    private double currentHeight = in, offset = 0;
 
-    // 0-1680
+    // 0-1100
 
-    public LinearSlide(HardwareMap hardwareMap){
-        DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");
-        DcMotorEx liftRight = hardwareMap.get(DcMotorEx.class,"Rlift");
-        touch = hardwareMap.get(TouchSensor.class, "touch");
+    public HorizontalSlide(HardwareMap hardwareMap){
+        DcMotorEx leftSlide = hardwareMap.get(DcMotorEx.class,"Lslide");
+        DcMotorEx rightSlide = hardwareMap.get(DcMotorEx.class,"Rslide");
+        touch = hardwareMap.get(TouchSensor.class, "Htouch");
 
-        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = new MotorGroup(liftLeft,liftRight);
+        motors = new MotorGroup(leftSlide,rightSlide);
     }
 
     public void moveTo(double target){
@@ -47,7 +48,7 @@ public class LinearSlide {
         return target - getPosition();
     }
 
-    public double getPosition() { return -motors.getPosition(0) + offset; }
+    public double getPosition() { return motors.getPosition(0) + offset; }
 
     public boolean isTimeDone() { return profile.getProfileDuration() < profile.getCurrentTime(); }
     public boolean isPositionDone() { return Math.abs(getError()) < 10; }
@@ -81,8 +82,8 @@ public class LinearSlide {
     }
 
     public void zero(){
-        moveTo(zero);
-        currentHeight = zero;
+        moveTo(in);
+        currentHeight = in;
     }
 
     public void transfer(){
@@ -96,8 +97,8 @@ public class LinearSlide {
     }
 
     public void high(){
-        moveTo(high);
-        currentHeight = high;
+        moveTo(out);
+        currentHeight = out;
     }
 
     public double returnPole() {

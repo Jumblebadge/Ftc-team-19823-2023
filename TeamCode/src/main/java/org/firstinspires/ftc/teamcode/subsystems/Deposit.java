@@ -23,6 +23,7 @@ public class Deposit {
 
     public static final Point score = new Point(45,0.22), mid = new Point(165,0.5), transfer = new Point(-45, 0.61);
     private final DualServo swing;
+    private final ServoImplEx latch;
     private final EncoderServo end;
     private final Telemetry telemetry;
     private Point target, current = mid;
@@ -37,15 +38,18 @@ public class Deposit {
         CRServoImplEx endServo = hardwareMap.get(CRServoImplEx.class, "endS");
         AnalogInput endEncoder = hardwareMap.get(AnalogInput.class, "endE");
 
+        latch = hardwareMap.get(ServoImplEx.class, "Dlatch");
+        latch.setPwmRange(new PwmControl.PwmRange(500,2500));
+
         swing = new DualServo(swingL, swingR);
         end = new EncoderServo(endServo, endEncoder);
 
         this.telemetry = telemetry;
     }
 
-    public void setSwingPosition(double target) {
-        swing.setPosition(target);
-    }
+    public void setSwingPosition(double target) { swing.setPosition(target); }
+
+    public void setLatchPosition(double target) { latch.setPosition(target); }
 
     public void setEndPosition(double target) {
         end.setPosition(target);
