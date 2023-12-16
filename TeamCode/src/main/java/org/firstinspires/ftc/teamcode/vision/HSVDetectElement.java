@@ -11,18 +11,16 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
-public class DetectElement implements VisionProcessor {
+public class HSVDetectElement implements VisionProcessor {
 
-    //TODO wtf is wrong
-
-    Rect left = new Rect(50, 90, 50, 30);
-    Rect middle = new Rect(150, 90, 50, 30);
-    Rect right = new Rect(230, 100, 50, 30);
+    Rect left = new Rect(150, 200, 150, 65);
+    Rect middle = new Rect(450, 200, 150, 65);
+    Rect right = new Rect(750, 200, 150, 65);
 
     private State detected = State.MID;
 
-    Telemetry telemetry;
 
     public enum State {
         RIGHT,
@@ -31,10 +29,7 @@ public class DetectElement implements VisionProcessor {
     }
 
     Mat submat = new Mat();
-
-    public DetectElement(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
+    Mat HSVmat = new Mat();
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
@@ -43,10 +38,11 @@ public class DetectElement implements VisionProcessor {
 
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
-        double leftSaturation = getSaturation(frame, left);
-        telemetry.addData("leftsat",leftSaturation);
-        double midSaturation = getSaturation(frame, middle);
-        double rightSaturation = getSaturation(frame, right);
+        Imgproc.cvtColor(frame, HSVmat, Imgproc.COLOR_RGB2HSV);
+
+        double leftSaturation = getSaturation(HSVmat, left);
+        double midSaturation = getSaturation(HSVmat, middle);
+        double rightSaturation = getSaturation(HSVmat, right);
 
         if (leftSaturation > midSaturation && leftSaturation > rightSaturation) {
             return State.LEFT;
@@ -63,12 +59,12 @@ public class DetectElement implements VisionProcessor {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(scaleCanvasDensity * 4);
 
-        Paint detectedPaint = new Paint(paint);
+        Paint detectedPaint = new Paint();
         detectedPaint.setColor(Color.GREEN);
+        detectedPaint.setStyle(Paint.Style.STROKE);
+        detectedPaint.setStrokeWidth(scaleCanvasDensity * 4);
 
         detected = (State) userContext;
-        telemetry.addData("et",userContext);
-        telemetry.update();
         switch(detected) {
             case LEFT:
                 canvas.drawRect(makeRect(left,scaleBmpPxToCanvasPx),detectedPaint);
@@ -90,8 +86,8 @@ public class DetectElement implements VisionProcessor {
 
     private double getSaturation(Mat input, Rect rect) {
         submat = input.submat(rect);
-        Scalar color = Core.mean(submat);
-        return color.val[1];
+        Scalar saturation = Core.mean(submat);
+        return saturation.val[1];
     }
 
     private android.graphics.Rect makeRect(Rect rect, float scale) {

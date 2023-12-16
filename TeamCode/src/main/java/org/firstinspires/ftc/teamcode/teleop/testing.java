@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
+import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 
 @Config

@@ -34,6 +34,13 @@ public class GoToPoint {
         this.dashboard = dashboard;
     }
 
+    /**
+     * @param pose current pose of the robot
+     * @param desiredPose target pose of the robot
+     * @param startPose robot pose when starting the movement
+     * @param update if the target should change
+     */
+
     public void driveToPoint(Pose2d pose,Pose2d desiredPose,Pose2d startPose,boolean update){
         distanceNow = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
         double distanceAtStart = Math.abs(Math.hypot(desiredPose.getX()-startPose.getX(),desiredPose.getY()-startPose.getY()));
