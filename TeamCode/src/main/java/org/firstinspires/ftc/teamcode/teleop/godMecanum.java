@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -32,10 +36,7 @@ public class godMecanum extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //to swerve the mecanum
-        //MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
-        HorizontalSlide slide = new HorizontalSlide(hardwareMap);
-        //Deposit deposit = new Deposit(hardwareMap, telemetry);
-        //Intake intake = new Intake(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
 
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -53,10 +54,6 @@ public class godMecanum extends LinearOpMode {
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
-        //deposit.transfer();
-
-        slide.resetEncoders();
-
         waitForStart();
         while (opModeIsActive()) {
 
@@ -66,12 +63,12 @@ public class godMecanum extends LinearOpMode {
             //driving gamepad
 
             if (game1a.toggle(gamepad1.a)) {
-                //rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
+                rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
             }
             else { rotation = 0; }
 
             if (game1rb.risingEdge(gamepad1.right_bumper)) {
-                //heading = drive.getHeading();
+                heading = drive.getHeading();
             }
 
             if (game1lb.risingEdge(gamepad1.left_bumper)) {
@@ -79,11 +76,18 @@ public class godMecanum extends LinearOpMode {
                 game1a.toTrue();
             }
 
-            //drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
+            drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
 
-            slide.moveTo(target);
-            slide.setPIDcoeffs(Kp,Kd,Ki,Kf,Kl);
-            slide.update();
+            TelemetryPacket packet = new TelemetryPacket();
+            Canvas fieldOverlay = packet.fieldOverlay();
+            Pose2d pose = drive.getPose();
+            drawRobot(fieldOverlay, drive.getPose());
+            packet.put("x", pose.getX());
+            packet.put("y", pose.getY());
+            packet.put("heading (deg)", Math.toDegrees(pose.getHeading()));
+
+            dashboard.sendTelemetryPacket(packet);
+
 
             //subsystem gamepad
             /**
@@ -111,13 +115,17 @@ public class godMecanum extends LinearOpMode {
             **/
             telemetry.addData("hz",1/hztimer.seconds());
             telemetry.addData("dulgk",target);
-            telemetry.addData("state",slide.getPosition());
-            telemetry.addData("essrs",slide.getError());
-            telemetry.addData("m;flj;",slide.getMotionTarget());
-            //telemetry.addData("pise",drive.getPose().toString());
+            telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();
             telemetry.update();
         }
+    }
+    public static void drawRobot(Canvas canvas, Pose2d pose) {
+        canvas.strokeCircle(pose.getX(), pose.getY(), 9);
+        Vector2d v = pose.headingVec().times(9);
+        double x1 = pose.getX() + v.getX() / 2, y1 = pose.getY() + v.getY() / 2;
+        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
+        canvas.strokeLine(x1, y1, x2, y2);
     }
 
 

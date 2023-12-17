@@ -29,11 +29,13 @@ public class Intake {
         intake.setPower(intakePower);
     }
 
+    public boolean isSlideDone() { return slide.isTimeDone() || slide.isPositionDone(); }
+
     public void setSlide(double target) { slide.moveTo(target); }
 
-    public void setLatchPosition(double target) { latch.setPosition(target); }
-
     public void update() { slide.update(); }
+
+    public void setLatchPosition(double target) { latch.setPosition(target); }
 
     public void eject(){
         intake.setPower(-intakePower);

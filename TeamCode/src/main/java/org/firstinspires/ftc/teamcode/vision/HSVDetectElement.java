@@ -15,12 +15,11 @@ import org.opencv.imgproc.Imgproc;
 
 public class HSVDetectElement implements VisionProcessor {
 
-    Rect left = new Rect(150, 200, 150, 65);
-    Rect middle = new Rect(450, 200, 150, 65);
-    Rect right = new Rect(750, 200, 150, 65);
+    Rect left = new Rect(0, 200, 70, 100);
+    Rect middle = new Rect(300, 170, 70, 90);
+    Rect right = new Rect(569, 200, 70, 100);
 
-    private State detected = State.MID;
-
+    private static State detected = State.MID;
 
     public enum State {
         RIGHT,
@@ -99,7 +98,7 @@ public class HSVDetectElement implements VisionProcessor {
         return new android.graphics.Rect(left,top,right,bottom);
     }
 
-    public State returnDetected() {
+    public static State returnDetected() {
         return detected;
     }
 

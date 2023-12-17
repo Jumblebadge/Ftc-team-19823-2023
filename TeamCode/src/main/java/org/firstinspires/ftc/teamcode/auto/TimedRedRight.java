@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -12,8 +13,9 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
 
 @Config
-@Autonomous(name="RedLeft", group="Linear Opmode")
-public class RedLeft extends LinearOpMode {
+@Disabled
+@Autonomous(name="RedRight", group="Linear Opmode")
+public class TimedRedRight extends LinearOpMode {
 
     private double heading = 0, rotation = 0;
 
@@ -47,13 +49,13 @@ public class RedLeft extends LinearOpMode {
 
             rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
 
-            if (timer.seconds() < 3.25) {
+            if (timer.seconds() < 0.45) {
                 drive.drive(0.5, 0, rotation);
             }
-            else if (timer.seconds() < 8) {
+            else if (timer.seconds() < 3) {
                 drive.drive(-0, 0.5, rotation);
             }
-            else if (timer.seconds() > 10) {
+            else if (timer.seconds() > 3) {
                 heading = 90;
                 drive.drive(0,0,rotation);
             }

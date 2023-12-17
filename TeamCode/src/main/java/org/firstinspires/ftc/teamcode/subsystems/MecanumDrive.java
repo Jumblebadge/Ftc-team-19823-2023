@@ -8,11 +8,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 import org.firstinspires.ftc.teamcode.utility.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.utility.TwoWheelTrackingLocalizer;
 
 public class MecanumDrive implements Driveable{
 
     final private IMU imu;
-    final private StandardTrackingWheelLocalizer odo;
+    final private TwoWheelTrackingLocalizer odo;
     final private DcMotorExW frontRight, frontLeft, backLeft, backRight;
     final private Telemetry telemetry;
     final private boolean isAuto;
@@ -33,7 +34,7 @@ public class MecanumDrive implements Driveable{
 
         imu = new IMU(hardwareMap);
 
-        odo = new StandardTrackingWheelLocalizer(hardwareMap);
+        odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
 
         this.telemetry = telemetry;
         this.isAuto = isAuto;
@@ -70,7 +71,7 @@ public class MecanumDrive implements Driveable{
     }
 
     public double getHeading() {
-        return imu.getHeadingInDegrees();
+        return imu.getHeadingInRadians();
     }
 
     public Pose2d getPose() {

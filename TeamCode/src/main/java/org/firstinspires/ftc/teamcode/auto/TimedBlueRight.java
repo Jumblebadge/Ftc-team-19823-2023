@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -12,8 +13,9 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
 
 @Config
+@Disabled
 @Autonomous(name="BlueRight", group="Linear Opmode")
-public class BlueRight extends LinearOpMode {
+public class TimedBlueRight extends LinearOpMode {
 
     private double heading = 0, rotation = 0;
 

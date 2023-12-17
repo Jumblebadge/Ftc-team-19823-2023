@@ -23,10 +23,13 @@ public class Deposit {
 
     public static final Point score = new Point(45,0.22), mid = new Point(165,0.5), transfer = new Point(-45, 0.61);
     private final DualServo swing;
-    private final ServoImplEx latch;
-    private final EncoderServo end;
+    private final ServoImplEx end;
+    //private final EncoderServo end;
+    private final VerticalSlide slide;
     private final Telemetry telemetry;
     private Point target, current = mid;
+
+    //deposit is end 0.4, swing 0.85
 
     public Deposit(HardwareMap hardwareMap, Telemetry telemetry) {
         ServoImplEx swingL = hardwareMap.get(ServoImplEx.class, "swingL");
@@ -35,37 +38,51 @@ public class Deposit {
         swingL.setPwmRange(new PwmControl.PwmRange(500, 2500));
         swingR.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        CRServoImplEx endServo = hardwareMap.get(CRServoImplEx.class, "endS");
-        AnalogInput endEncoder = hardwareMap.get(AnalogInput.class, "endE");
+        end = hardwareMap.get(ServoImplEx.class, "endS");
+        end.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        //AnalogInput endEncoder = hardwareMap.get(AnalogInput.class, "endE");
 
-        latch = hardwareMap.get(ServoImplEx.class, "Dlatch");
-        latch.setPwmRange(new PwmControl.PwmRange(500,2500));
+        //latch = hardwareMap.get(ServoImplEx.class, "Dlatch");
+        //latch.setPwmRange(new PwmControl.PwmRange(500,2500));
 
         swing = new DualServo(swingL, swingR);
-        end = new EncoderServo(endServo, endEncoder);
+        //end = new EncoderServo(endServo, endEncoder);
+        slide = new VerticalSlide(hardwareMap);
 
         this.telemetry = telemetry;
     }
 
+    public boolean isSlideDone() { return slide.isTimeDone() || slide.isPositionDone(); }
+
+    public void setSlide(double target) { slide.moveTo(target); }
+
     public void setSwingPosition(double target) { swing.setPosition(target); }
 
-    public void setLatchPosition(double target) { latch.setPosition(target); }
+    //public void setLatchPosition(double target) { latch.setPosition(target); }
 
-    public void setEndPosition(double target) {
-        end.setPosition(target);
-    }
+    public void setEndPosition(double target) { end.setPosition(target); }
 
     public double swingPosition(){
         return  swing.getPosition();
     }
 
-    public double endPosition(){
-        return  end.getPosition();
-    }
+    //public double endPosition(){ return  end.getPosition(); }
 
     public void PWMrelease() {
         swing.PWMrelease();
-        end.PWMrelease();
+        end.setPwmDisable();
+    }
+
+    public void setLatch(double position) {
+        //latch.setPosition(position);
+    }
+
+    public void activateLatch() {
+        setLatch(0.5);
+    }
+
+    public void disableLatch() {
+        setLatch(0.4);
     }
 
     public void score(double adjust) {
@@ -89,11 +106,12 @@ public class Deposit {
     }
 
     public void update() {
-        isAt();
-        end.update((target == score && current == transfer) || (target == transfer && current == score));
+        //isAt();
+        //end.update((target == score && current == transfer) || (target == transfer && current == score));
         telemetry.addData("??", target == score && current == transfer || target == transfer && current == score);
+        slide.update();
     }
-
+/*
     public void isAt() {
         if (mathsOperations.equals(endPosition(),mid.x,5)) {
             current = mid;
@@ -106,9 +124,9 @@ public class Deposit {
         }
         telemetry.addData("cerent",current);
     }
-
+*/
     public void setR(double r){
-        end.setR(r);
+        //end.setR(r);
     }
 
 }

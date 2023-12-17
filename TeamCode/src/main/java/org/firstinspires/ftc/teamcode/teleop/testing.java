@@ -31,11 +31,11 @@ public class testing extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        CubicPath path = new CubicPath(telemetry,A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
-        GVF gvf = new GVF(dashboard,path,1);
+        //CubicPath path = new CubicPath(telemetry,A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
+        //GVF gvf = new GVF(dashboard,path,1);
         Deposit deposit = new Deposit(hardwareMap,telemetry);
-        ServoImplEx servo = hardwareMap.get(ServoImplEx.class,"miniD");
-        servo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        //ServoImplEx servo = hardwareMap.get(ServoImplEx.class,"miniD");
+        //servo.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         dashboard = FtcDashboard.getInstance();
 
@@ -51,15 +51,15 @@ public class testing extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            telemetry.addData("gvfx",gvf.output(Robot).getX());
-            telemetry.addData("gvfy",gvf.output(Robot).getY());
+            //telemetry.addData("gvfx",gvf.output(Robot).getX());
+            //telemetry.addData("gvfy",gvf.output(Robot).getY());
 
             controlHub.clearBulkCache();
 
             deposit.setSwingPosition(swingPosition);
             deposit.setEndPosition(endPosition);
             telemetry.addData("te", swingPosition);
-            servo.setPosition(servoTest);
+            //servo.setPosition(servoTest);
 
 
             telemetry.update();
