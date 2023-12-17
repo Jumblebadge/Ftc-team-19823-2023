@@ -35,7 +35,7 @@ public class IMU {
 
     public double getHeadingInRadians() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-        return AngleUnit.normalizeRadians(angles.firstAngle);
+        return AngleUnit.normalizeRadians(angles.firstAngle + Math.toRadians(imuOffset));
     }
 
     public void setImuOffset(double offset) {

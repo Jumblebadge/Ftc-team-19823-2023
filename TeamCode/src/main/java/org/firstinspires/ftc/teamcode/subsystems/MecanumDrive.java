@@ -74,6 +74,10 @@ public class MecanumDrive implements Driveable{
         return imu.getHeadingInRadians();
     }
 
+    public double getHeadingInDegrees() {
+        return imu.getHeadingInDegrees();
+    }
+
     public Pose2d getPose() {
         odo.update();
         return odo.getPoseEstimate();

@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
 
 @Config
-@Disabled
 @Autonomous(name="RedLeft", group="Linear Opmode")
 public class TimedRedLeft extends LinearOpMode {
 
@@ -26,7 +25,7 @@ public class TimedRedLeft extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //to swerve the mecanum
-        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
+        MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
         //Deposit deposit = new Deposit(hardwareMap, telemetry);
         //Intake intake = new Intake(hardwareMap);
 
@@ -47,13 +46,13 @@ public class TimedRedLeft extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
-            rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
+            rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeadingInDegrees()));
 
-            if (timer.seconds() < 3.25) {
-                drive.drive(0.5, 0, rotation);
+            if (timer.seconds() < 2.5) {
+                drive.drive(-0.5, 0, rotation);
             }
-            else if (timer.seconds() < 8) {
-                drive.drive(-0, 0.5, rotation);
+            else if (timer.seconds() < 10) {
+                drive.drive(-0, -0.25, rotation);
             }
             else if (timer.seconds() > 10) {
                 heading = 90;

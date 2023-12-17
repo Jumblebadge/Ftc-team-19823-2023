@@ -63,7 +63,7 @@ public class godMecanum extends LinearOpMode {
             //driving gamepad
 
             if (game1a.toggle(gamepad1.a)) {
-                rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeading()));
+                rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeadingInDegrees()));
             }
             else { rotation = 0; }
 
@@ -74,6 +74,10 @@ public class godMecanum extends LinearOpMode {
             if (game1lb.risingEdge(gamepad1.left_bumper)) {
                 heading = 0;
                 game1a.toTrue();
+            }
+
+            if (gamepad1.b) {
+                drive.resetIMU();
             }
 
             drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));

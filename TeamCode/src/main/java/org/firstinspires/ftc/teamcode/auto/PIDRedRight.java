@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 
 
 @Config
+@Disabled
 @Autonomous(name="Red Right", group="Linear Opmode")
 public class PIDRedRight extends LinearOpMode {
 
