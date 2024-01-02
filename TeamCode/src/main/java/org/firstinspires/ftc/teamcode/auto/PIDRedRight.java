@@ -23,7 +23,6 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 
 
 @Config
-@Disabled
 @Autonomous(name="Red Right", group="Linear Opmode")
 public class PIDRedRight extends LinearOpMode {
 
@@ -92,6 +91,7 @@ public class PIDRedRight extends LinearOpMode {
         targetPose = new Pose2d(0.1,0.1,0.001);
         goofytimer.reset();
         drive.resetIMU();
+        portal.close();
 
 
         while (opModeIsActive()) {

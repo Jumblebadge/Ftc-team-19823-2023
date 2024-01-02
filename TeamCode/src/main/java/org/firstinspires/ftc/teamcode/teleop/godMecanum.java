@@ -14,7 +14,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.HorizontalSlide;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
@@ -27,7 +29,7 @@ public class godMecanum extends LinearOpMode {
     FtcDashboard dashboard;
 
     private double rotation, heading;
-    public static double target=0, Kp=0, Kd=0, Ki=0, Kf=0, Kl=1000;
+    public static double intakeTarget=0, depositTarget = 0, intakePower = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -37,15 +39,16 @@ public class godMecanum extends LinearOpMode {
 
         //to swerve the mecanum
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
+        Deposit deposit = new Deposit(hardwareMap, telemetry);
+        Intake intake = new Intake(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        ButtonDetector game2dl  = new ButtonDetector();
-        ButtonDetector game2rb  = new ButtonDetector();
-        ButtonDetector game1a   = new ButtonDetector();
-        ButtonDetector game1rb  = new ButtonDetector();
-        ButtonDetector game1lb  = new ButtonDetector();
+        ButtonDetector game1a  = new ButtonDetector();
+        ButtonDetector game1rb = new ButtonDetector();
+        ButtonDetector game1lb = new ButtonDetector();
+        ButtonDetector game2lb = new ButtonDetector();
 
         ElapsedTime hztimer = new ElapsedTime();
 
@@ -92,7 +95,36 @@ public class godMecanum extends LinearOpMode {
 
             dashboard.sendTelemetryPacket(packet);
 
+            if (gamepad2.a) {
+                deposit.setSlide(0);
+            }
+            if (gamepad2.b) {
+                deposit.setSlide(400);
+            }
+            if (gamepad2.x) {
+                deposit.setSlide(800);
+            }
+            if (gamepad2.y) {
+                deposit.setSlide(1200);
+            }
 
+            if (gamepad2.dpad_down) {
+                intake.setSlide(0);
+            }
+            if (gamepad2.dpad_right) {
+                intake.setSlide(100);
+            }
+            if (gamepad2.dpad_left) {
+                intake.setSlide(200);
+            }
+            if (gamepad2.dpad_up) {
+                intake.setSlide(400);
+            }
+            intakePower = gamepad2.left_trigger;
+            intake.setIntakePower(intakePower);
+            if (game2lb.toggle(gamepad2.left_bumper)) {
+                intakePower *= -1;
+            }
             //subsystem gamepad
             /**
             if (gamepad2.dpad_right) {
@@ -117,8 +149,15 @@ public class godMecanum extends LinearOpMode {
                 intake.off();
             }
             **/
+            //intake.setSlide(intakeTarget);
+            intake.setIntakePower(intakePower);
+            intake.update();
+
+            //deposit.setSlide(depositTarget);
+            deposit.update();
+
             telemetry.addData("hz",1/hztimer.seconds());
-            telemetry.addData("dulgk",target);
+            telemetry.addData("slide", intake.getPosition());
             telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();
             telemetry.update();

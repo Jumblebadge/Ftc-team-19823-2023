@@ -24,6 +24,8 @@ public class CubicPath {
     }
 
     public Vector2d getPoint(double T) {
+        if (T < 0) { T = 0; }
+        if (T >= 3) { T = 2.9999; }
         return beziers[(int) T].getPoint(T - Math.floor(T));
     }
 
@@ -40,33 +42,42 @@ public class CubicPath {
     }
 
     public int whichBezierFromDistance(double distance) {
-        if (distance <= beziers[0].getTotalArcLength()) {
+        double bezier0TotalArcLength = beziers[0].getTotalArcLength();
+        double bezier1TotalArcLength = beziers[1].getTotalArcLength();
+        double bezier2TotalArcLength = beziers[2].getTotalArcLength();
+
+        if (distance <= bezier0TotalArcLength) {
             return 0;
         }
-        else if (beziers[0].getTotalArcLength() <= distance && distance <= beziers[1].getTotalArcLength()) {
+        else if (/*bezier0TotalArcLength <= distance &&*/ distance <= bezier0TotalArcLength + bezier1TotalArcLength) {
             return 1;
         }
-        else if (beziers[1].getTotalArcLength() <= distance && distance <= beziers[2].getTotalArcLength()) {
+        else if (bezier0TotalArcLength + bezier1TotalArcLength <= distance && distance <= bezier0TotalArcLength + bezier1TotalArcLength + bezier2TotalArcLength) {
             return 2;
         }
-        return 300;
+        return -1;
     }
 
     public double distanceToT(double distance) {
-        return beziers[whichBezierFromDistance(distance)].distanceToT(distance);
+        int bezier = whichBezierFromDistance(distance);
+        telemetry.addData("which bexeiar: ", bezier);
+        return (beziers[bezier].distanceToT(distance)) + bezier;
     }
 
     public Vector2d findClosestPointOnPath(Vector2d Robot) {
         guessT = 0;
         double arcLength = 0;
         for (int i = 0; i <= 10; i++) {
-            //TODO wtf why is it negative (check t -> s its def broken)
             Vector2d guess = getPoint(guessT);
             Vector2d robotVector = new Vector2d(Robot.getX() - guess.getX(), Robot.getY() - guess.getY());
-            arcLength += guess.dot(robotVector);
+            Vector2d normalizedTangent = getNormalizedTangent(guessT).minus(guess);
+            arcLength += normalizedTangent.dot(robotVector);
+            if (arcLength < 0) { guessT = 0; arcLength = 0; }
             guessT = distanceToT(arcLength);
+            telemetry.addData("guess",getPoint(guessT));
+            telemetry.addData("arc",arcLength);
         }
-        telemetry.addData("duess",getPoint(guessT));
+        telemetry.addData("t",guessT);
         return getPoint(guessT);
     }
 

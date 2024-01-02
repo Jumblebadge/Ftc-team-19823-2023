@@ -19,7 +19,7 @@ public class VerticalSlide {
     public static final double high = 1700, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
     private double currentHeight = zero, offset = 0;
 
-    // 0-1680
+    // 0-1600
 
     public VerticalSlide(HardwareMap hardwareMap){
         DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");

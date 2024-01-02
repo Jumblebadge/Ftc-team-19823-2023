@@ -33,6 +33,8 @@ public class Intake {
 
     public void setSlide(double target) { slide.moveTo(target); }
 
+    public double getPosition() { return slide.getPosition(); }
+
     public void update() { slide.update(); }
 
     public void setLatchPosition(double target) { latch.setPosition(target); }
@@ -44,5 +46,7 @@ public class Intake {
     public void off(){
         intake.setPower(0);
     }
+
+    public void setIntakePower(double power) { intake.setPower(power); }
 
 }

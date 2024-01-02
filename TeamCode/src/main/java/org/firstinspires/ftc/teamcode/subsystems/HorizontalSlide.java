@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class HorizontalSlide {
 
-    //TODO make one motor
-    private final MotorGroup motors;
+    //TODO fix this
+    private final DcMotorEx motor;
     private double target;
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
@@ -23,13 +23,10 @@ public class HorizontalSlide {
     // 0-1100
 
     public HorizontalSlide(HardwareMap hardwareMap){
-        DcMotorEx leftSlide = hardwareMap.get(DcMotorEx.class,"Lslide");
-        DcMotorEx rightSlide = hardwareMap.get(DcMotorEx.class,"Rslide");
+        motor = hardwareMap.get(DcMotorEx.class,"Hslide");
         touch = hardwareMap.get(TouchSensor.class, "Htouch");
 
-        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        motors = new MotorGroup(leftSlide,rightSlide);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void moveTo(double target){
@@ -40,15 +37,14 @@ public class HorizontalSlide {
         if (touch.isPressed()) {
             resetEncoders();
         }
-        motors.setPower(profile.profiledMovement(target, getPosition()),0);
-        motors.setPower(profile.profiledMovement(target, getPosition()),1);
+        motor.setPower(profile.profiledMovement(target, getPosition()));
     }
 
     public double getError(){
         return target - getPosition();
     }
 
-    public double getPosition() { return motors.getPosition(0) + offset; }
+    public double getPosition() { return motor.getCurrentPosition() + offset; }
 
     public boolean isTimeDone() { return profile.getProfileDuration() < profile.getCurrentTime(); }
     public boolean isPositionDone() { return Math.abs(getError()) < 10; }
@@ -70,10 +66,8 @@ public class HorizontalSlide {
     public double getMotionTime() { return profile.getCurrentTime(); }
 
     public void resetEncoders(){
-        motors.motors[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motors.motors[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motors.motors[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motors.motors[1].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         offset = 0;
     }
 

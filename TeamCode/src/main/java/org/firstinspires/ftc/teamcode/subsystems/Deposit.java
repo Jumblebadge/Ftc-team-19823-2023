@@ -54,6 +54,8 @@ public class Deposit {
 
     public boolean isSlideDone() { return slide.isTimeDone() || slide.isPositionDone(); }
 
+    public double getPosition() { return slide.getPosition(); }
+
     public void setSlide(double target) { slide.moveTo(target); }
 
     public void setSwingPosition(double target) { swing.setPosition(target); }

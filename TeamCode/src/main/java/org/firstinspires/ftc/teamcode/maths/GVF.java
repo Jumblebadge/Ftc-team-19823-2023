@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
@@ -9,11 +10,13 @@ public class GVF {
 
     CubicPath path;
     Vector2d R, closestPoint;
+    FtcDashboard dashboard;
     double Kn;
 
     public GVF(FtcDashboard dashboard, CubicPath path, double Kn) {
         this.path = path;
         this.Kn = Kn;
+        this.dashboard = dashboard;
     }
 
     public void setKn(double Kn) {
@@ -35,23 +38,28 @@ public class GVF {
         Vector2d normal = path.getNormalizedNormal(path.guessT);
         double error = calculateError();
         double max = Math.max(tangent.minus(normal.times(Kn).times(error)).getX(), tangent.minus(normal.times(Kn).times(error)).getY());
+        drawPath(dashboard, path, new Pose2d(Robot.getX(), Robot.getY()));
         if (max > 1) {
             return tangent.minus(normal.times(Kn).times(error)).div(max);
         }
-        //all that work for one line LMAO
         return tangent.minus(normal.times(Kn).times(error));
     }
 
-    public static void drawPath(Canvas canvas, CubicPath path) {
+    public void drawPath(FtcDashboard dash, CubicPath path, Pose2d robot) {
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas canvas = packet.fieldOverlay();
         Vector2d[] points = new Vector2d[30];
         double[] x = new double[points.length];
         double[] y = new double[points.length];
-        for (int i = 0; i <= points.length; i++) {
+        for (int i = 0; i < points.length; i++) {
             points[i] = path.getPoint((double) i * 3 / points.length);
             x[i] = points[i].getX();
             y[i] = points[i].getY();
         }
         canvas.strokePolyline(x,y);
+        drawRobot(canvas, robot);
+        drawRobot(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY()));
+        dash.sendTelemetryPacket(packet);
     }
 
     public static void drawRobot(Canvas canvas, Pose2d pose) {

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.utility;
 
-import java.util.TreeMap;
-
 public class ButtonDetector {
 
     public boolean current = false;
