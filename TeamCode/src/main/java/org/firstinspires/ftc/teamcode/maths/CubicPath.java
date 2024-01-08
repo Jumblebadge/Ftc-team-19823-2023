@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class CubicPath {
 
     public Bezier[] beziers = new Bezier[3];
-    public double guessT = 0;
+    public double guessT = 0, arcLength = 0;
     Telemetry telemetry;
 
     public CubicPath(Telemetry telemetry, Vector2d A1, Vector2d A2, Vector2d A3, Vector2d A4, Vector2d B1, Vector2d B2, Vector2d B3, Vector2d B4, Vector2d C1, Vector2d C2, Vector2d C3, Vector2d C4) {
@@ -65,8 +65,6 @@ public class CubicPath {
     }
 
     public Vector2d findClosestPointOnPath(Vector2d Robot) {
-        guessT = 0;
-        double arcLength = 0;
         for (int i = 0; i <= 10; i++) {
             Vector2d guess = getPoint(guessT);
             Vector2d robotVector = new Vector2d(Robot.getX() - guess.getX(), Robot.getY() - guess.getY());

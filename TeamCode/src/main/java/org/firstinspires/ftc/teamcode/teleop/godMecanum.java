@@ -28,8 +28,8 @@ public class godMecanum extends LinearOpMode {
 
     FtcDashboard dashboard;
 
-    private double rotation, heading;
-    public static double intakeTarget=0, depositTarget = 0, intakePower = 0;
+    private double rotation, heading, hzCount = 1, hz = 0;
+    public static double latch=0.825, depositTarget = 0, intakePower = 0, canopee = 0.05;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -56,6 +56,9 @@ public class godMecanum extends LinearOpMode {
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        
+        deposit.resetEncoders();
+        intake.resetEncoders();
 
         waitForStart();
         while (opModeIsActive()) {
@@ -120,11 +123,11 @@ public class godMecanum extends LinearOpMode {
             if (gamepad2.dpad_up) {
                 intake.setSlide(400);
             }
-            intakePower = gamepad2.left_trigger;
-            intake.setIntakePower(intakePower);
+            intakePower = gamepad2.left_trigger/2;
             if (game2lb.toggle(gamepad2.left_bumper)) {
                 intakePower *= -1;
             }
+            intake.setIntakePower(intakePower);
             //subsystem gamepad
             /**
             if (gamepad2.dpad_right) {
@@ -150,13 +153,17 @@ public class godMecanum extends LinearOpMode {
             }
             **/
             //intake.setSlide(intakeTarget);
-            intake.setIntakePower(intakePower);
+            intake.setCanopeePosition(canopee);
+            intake.setLatchPosition(latch);
             intake.update();
 
             //deposit.setSlide(depositTarget);
             deposit.update();
 
-            telemetry.addData("hz",1/hztimer.seconds());
+            telemetry.addData("hz",(hz + 1/hztimer.seconds())/hzCount);
+            hzCount++;
+            hz += 1/hztimer.seconds();
+
             telemetry.addData("slide", intake.getPosition());
             telemetry.addData("pise",drive.getPose().toString());
             hztimer.reset();

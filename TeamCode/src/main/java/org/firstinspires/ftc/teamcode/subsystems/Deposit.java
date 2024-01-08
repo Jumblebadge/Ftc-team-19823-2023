@@ -68,6 +68,12 @@ public class Deposit {
         return  swing.getPosition();
     }
 
+    public void resetEncoders() { slide.resetEncoders(); }
+
+    public void disabledPIDsetPower(double power) {
+        slide.disabledPIDsetPower(power);
+    }
+
     //public double endPosition(){ return  end.getPosition(); }
 
     public void PWMrelease() {

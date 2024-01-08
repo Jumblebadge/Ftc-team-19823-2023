@@ -40,7 +40,7 @@ public class GVF {
         double max = Math.max(tangent.minus(normal.times(Kn).times(error)).getX(), tangent.minus(normal.times(Kn).times(error)).getY());
         drawPath(dashboard, path, new Pose2d(Robot.getX(), Robot.getY()));
         if (max > 1) {
-            return tangent.minus(normal.times(Kn).times(error)).div(max);
+            return (tangent.minus(normal.times(Kn).times(error))).div(max);
         }
         return tangent.minus(normal.times(Kn).times(error));
     }

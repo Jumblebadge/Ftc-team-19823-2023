@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class VerticalSlide {
 
-    private final MotorGroup motors;
+    public final MotorGroup motors;
     private double target;
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
@@ -41,6 +41,11 @@ public class VerticalSlide {
         }
         motors.setPower(profile.profiledMovement(target, getPosition()),0);
         motors.setPower(profile.profiledMovement(target, getPosition()),1);
+    }
+
+    public void disabledPIDsetPower(double power) {
+        motors.setPower(power,0);
+        motors.setPower(power,1);
     }
 
     public double getError(){
