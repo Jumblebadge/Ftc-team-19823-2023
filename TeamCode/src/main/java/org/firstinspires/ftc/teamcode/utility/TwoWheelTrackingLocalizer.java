@@ -48,14 +48,20 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, IMU imu) {
         super(Arrays.asList(
-                new Pose2d(2.621, -4.771, 0), // left
-                new Pose2d(-5.063, -2.136, Math.toRadians(90)) // front
+                //new Pose2d(2.621, -4.771, 0), // left
+                //new Pose2d(-5.063, -2.136, Math.toRadians(90)) // front
+                //old bot
+                new Pose2d(4.24, -6.3189, Math.toRadians(180)),
+                new Pose2d(-3.074, -0.714, Math.toRadians(90))
         ));
 
         this.imu = imu;
 
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontRight"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backRight"));
+        //only reverse if old bot
+        parallelEncoder.setDirection(Encoder.Direction.REVERSE);
+        perpendicularEncoder.setDirection(Encoder.Direction.REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {

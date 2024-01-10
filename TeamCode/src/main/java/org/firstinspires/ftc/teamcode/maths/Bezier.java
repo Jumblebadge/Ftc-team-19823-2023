@@ -44,7 +44,7 @@ public class Bezier {
 
     public Vector2d getNormalizedTangent(double T) {
         Vector2d firstDerivative = firstDerivative(T);
-        return getPoint(T).plus(firstDerivative.div(firstDerivative.distTo(new Vector2d(0,0))));
+        return firstDerivative.div(firstDerivative.distTo(new Vector2d(0,0)));
     }
 
     public Vector2d getNormalizedNormal(double T) {
@@ -53,8 +53,8 @@ public class Bezier {
 
     public double getTotalArcLength() {
         double total = 0;
-        for (double i = 0; i <= 20; i++) {
-            total += getPoint(i / 20).distTo(getPoint((i + 1) / 20));
+        for (double i = 0; i <= 50; i++) {
+            total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
         }
         return total;
     }

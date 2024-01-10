@@ -86,4 +86,8 @@ public class mathsOperations {
 
         return new Vector2d((midy - b) / m, midy);
     }
+
+    public static double cross(Vector2d a, Vector2d b) {
+        return a.getX() * b.getY() - a.getY() * b.getX();
+    }
 }

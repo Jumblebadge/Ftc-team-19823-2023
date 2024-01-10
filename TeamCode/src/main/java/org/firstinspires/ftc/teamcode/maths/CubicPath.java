@@ -8,6 +8,7 @@ public class CubicPath {
 
     public Bezier[] beziers = new Bezier[3];
     public double guessT = 0, arcLength = 0;
+    double[] arcLengths = new double[beziers.length];
     Telemetry telemetry;
 
     public CubicPath(Telemetry telemetry, Vector2d A1, Vector2d A2, Vector2d A3, Vector2d A4, Vector2d B1, Vector2d B2, Vector2d B3, Vector2d B4, Vector2d C1, Vector2d C2, Vector2d C3, Vector2d C4) {
@@ -35,24 +36,28 @@ public class CubicPath {
 
     public double getTotalArcLength() {
         double total = 0;
+        int i = 0;
         for (Bezier bezier : beziers) {
-            total += bezier.getTotalArcLength();
+            double length = bezier.getTotalArcLength();
+            total += length;
+            arcLengths[i] = length;
+            i++;
         }
         return total;
     }
 
     public int whichBezierFromDistance(double distance) {
-        double bezier0TotalArcLength = beziers[0].getTotalArcLength();
-        double bezier1TotalArcLength = beziers[1].getTotalArcLength();
-        double bezier2TotalArcLength = beziers[2].getTotalArcLength();
+        telemetry.addData("arc 0",arcLengths[0]);
+        telemetry.addData("arc 1",arcLengths[1]);
+        telemetry.addData("arc 2",arcLengths[2]);
 
-        if (distance <= bezier0TotalArcLength) {
+        if (distance <= arcLengths[0]) {
             return 0;
         }
-        else if (/*bezier0TotalArcLength <= distance &&*/ distance <= bezier0TotalArcLength + bezier1TotalArcLength) {
+        else if (/*arcLengths[0] <= distance &&*/ distance <= arcLengths[0] + arcLengths[1]) {
             return 1;
         }
-        else if (bezier0TotalArcLength + bezier1TotalArcLength <= distance && distance <= bezier0TotalArcLength + bezier1TotalArcLength + bezier2TotalArcLength) {
+        else if (arcLengths[0] + arcLengths[1] <= distance && distance <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
             return 2;
         }
         return -1;
@@ -61,18 +66,26 @@ public class CubicPath {
     public double distanceToT(double distance) {
         int bezier = whichBezierFromDistance(distance);
         telemetry.addData("which bexeiar: ", bezier);
-        return (beziers[bezier].distanceToT(distance)) + bezier;
+        double minus = 0;
+        if (bezier == 1) { minus = arcLengths[0]; }
+        if (bezier == 2) { minus = arcLengths[0] + arcLengths[1]; }
+        telemetry.addData("fixedT", (beziers[bezier].distanceToT(distance - minus)) + bezier);
+        return (beziers[bezier].distanceToT(distance - minus)) + bezier;
     }
 
     public Vector2d findClosestPointOnPath(Vector2d Robot) {
         for (int i = 0; i <= 10; i++) {
             Vector2d guess = getPoint(guessT);
             Vector2d robotVector = new Vector2d(Robot.getX() - guess.getX(), Robot.getY() - guess.getY());
-            Vector2d normalizedTangent = getNormalizedTangent(guessT).minus(guess);
+            Vector2d normalizedTangent = getNormalizedTangent(guessT);
+            double totalArcLength = getTotalArcLength();
             arcLength += normalizedTangent.dot(robotVector);
+            telemetry.addData("dot",normalizedTangent.dot(robotVector));
             if (arcLength < 0) { guessT = 0; arcLength = 0; }
+            if (arcLength >= totalArcLength) { arcLength = totalArcLength - 0.01; }
             guessT = distanceToT(arcLength);
-            telemetry.addData("guess",getPoint(guessT));
+            if (guessT > 2.999) { guessT = 2.999; }
+            telemetry.addData("guessT",(guessT));
             telemetry.addData("arc",arcLength);
         }
         telemetry.addData("t",guessT);
