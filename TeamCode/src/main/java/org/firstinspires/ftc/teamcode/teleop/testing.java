@@ -29,6 +29,7 @@ public class testing extends LinearOpMode {
     public static double x = -4, y = 4;
     public Vector2d Robot = new Vector2d(x,y);
     FtcDashboard dashboard;
+    private double nanoTime = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -57,10 +58,11 @@ public class testing extends LinearOpMode {
         while (opModeIsActive()) {
 
             controlHub.clearBulkCache();
+
             TelemetryPacket packet = new TelemetryPacket();
             Canvas fieldOverlay = packet.fieldOverlay();
             Pose2d pose = drive.getPose();
-            drawRobot(fieldOverlay, drive.getPose());
+            drawRobot(fieldOverlay, pose);
             packet.put("x", pose.getX());
             packet.put("y", pose.getY());
             packet.put("heading (deg)", Math.toDegrees(pose.getHeading()));
@@ -70,6 +72,10 @@ public class testing extends LinearOpMode {
 
 
             path.setControlPoints(A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4);
+
+            double nano = System.nanoTime();
+            telemetry.addData("hz", 1000000000 / (nano - nanoTime));
+            nanoTime = nano;
 
             telemetry.addData("gvfx",gvfOut.getX());
             telemetry.addData("gvfy",gvfOut.getY());
@@ -81,6 +87,7 @@ public class testing extends LinearOpMode {
             telemetry.update();
         }
     }
+
     public static void drawRobot(Canvas canvas, Pose2d pose) {
         canvas.strokeCircle(pose.getX(), pose.getY(), 9);
         Vector2d v = pose.headingVec().times(9);

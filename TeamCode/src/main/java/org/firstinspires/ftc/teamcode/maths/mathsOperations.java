@@ -5,7 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 public class mathsOperations {
 
     //normalizes the angle given
-    public static double angleWrap(double wrap){
+    public static double angleWrap(double wrap) {
 
         while(wrap <= -180) {
             wrap += 360;
@@ -17,21 +17,21 @@ public class mathsOperations {
     }
 
     //replaces turning a module by 180 degrees with reversing motor power.
-    public static double[] efficientTurn(double reference,double state,double power){
+    public static double[] efficientTurn(double reference,double state,double power) {
         double error = reference-state;
 
-        while(error>90) {
-            power *=-1;
+        while(error > 90) {
+            power *= -1;
             reference -= 180;
-            error = reference-state;
+            error = reference - state;
         }
         while(error<-90) {
-            power *=-1;
+            power *= -1;
             reference += 180;
-            error = reference-state;
+            error = reference - state;
         }
 
-        return new double[]{reference,power};
+        return new double[] {reference,power};
     }
 
     public static boolean dynamicTurn(double error){ return Math.abs(error) > 90; }
@@ -45,7 +45,7 @@ public class mathsOperations {
             m1 /= Math.abs(maxi);
             m2 /= Math.abs(maxi);
         }
-        return new double[]{m1,m2};
+        return new double[] {m1,m2};
     }
 
     //math for detecting when an absolute encoder has wrapped around

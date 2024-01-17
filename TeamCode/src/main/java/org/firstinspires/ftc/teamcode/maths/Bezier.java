@@ -6,8 +6,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Bezier {
 
-    private final Vector2d A,B,C,D;
+    private Vector2d A,B,C,D;
     public Vector2d[] lookup = new Vector2d[51];
+    private double totalArcLength;
 
     public Bezier(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
         this.A = A;
@@ -16,6 +17,17 @@ public class Bezier {
         this.D = D;
 
         generateLookup();
+        calculateTotalArcLength();
+    }
+
+    public void setControlPoints(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
+        this.A = A;
+        this.B = B;
+        this.C = C;
+        this.D = D;
+
+        generateLookup();
+        calculateTotalArcLength();
     }
 
     public void generateLookup() {
@@ -52,11 +64,15 @@ public class Bezier {
     }
 
     public double getTotalArcLength() {
+        return totalArcLength;
+    }
+
+    public void calculateTotalArcLength() {
         double total = 0;
         for (double i = 0; i <= 50; i++) {
             total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
         }
-        return total;
+        totalArcLength = total;
     }
 
     public double getArcLength(double T) {

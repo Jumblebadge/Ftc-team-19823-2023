@@ -15,13 +15,13 @@ public class swerveKinematics {
         }
 
         //the joystick values (after rotated) converted into vectors (split in x and y) that are wheel specific, displacement vectors per wheel also
-        double mod1strafe = strafe1-rotate*1;
-        double mod2strafe = strafe1-rotate*-0.5;
-        double mod3strafe = strafe1-rotate*-0.5;
+        double mod1strafe = strafe1 - rotate * 1;
+        double mod2strafe = strafe1 - rotate * -0.5;
+        double mod3strafe = strafe1 - rotate * -0.5;
 
         double mod1forward = forward1; //top wheel at x 0
-        double mod2forward = forward1+rotate*0.866;
-        double mod3forward = forward1+rotate*-0.866;
+        double mod2forward = forward1 + rotate * 0.866;
+        double mod3forward = forward1 + rotate * -0.866;
 
         //extracting the length of our wheel specific vectors (speed)
         double mod1speed = Math.sqrt((mod1strafe * mod1strafe) + (mod1forward * mod1forward));
@@ -38,10 +38,10 @@ public class swerveKinematics {
         }
 
         //extracting the angle of our wheel specific vectors (angle)
-        double mod1angle = Math.atan2(mod1strafe, mod1forward)*180 / Math.PI;
-        double mod2angle = Math.atan2(mod2strafe, mod2forward)*180 / Math.PI;
-        double mod3angle = Math.atan2(mod3strafe, mod3forward)*180 / Math.PI;
+        double mod1angle = Math.atan2(mod1strafe, mod1forward) * 180 / Math.PI;
+        double mod2angle = Math.atan2(mod2strafe, mod2forward) * 180 / Math.PI;
+        double mod3angle = Math.atan2(mod3strafe, mod3forward) * 180 / Math.PI;
 
-        return new double[]{mod1speed,mod2speed,mod3speed,mod1angle,mod2angle,mod3angle};
+        return new double[] {mod1speed,mod2speed,mod3speed,mod1angle,mod2angle,mod3angle};
     }
 }

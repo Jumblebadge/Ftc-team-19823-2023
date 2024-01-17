@@ -8,6 +8,7 @@ public class CubicPath {
 
     public Bezier[] beziers = new Bezier[3];
     public double guessT = 0, arcLength = 0;
+    private double totalArcLength;
     double[] arcLengths = new double[beziers.length];
     Telemetry telemetry;
 
@@ -15,13 +16,17 @@ public class CubicPath {
         beziers[0] = new Bezier(A1, A2, A3, A4);
         beziers[1] = new Bezier(B1, B2, B3, B4);
         beziers[2] = new Bezier(C1, C2, C3, C4);
+
+        calculateTotalArcLength();
+
         this.telemetry = telemetry;
     }
 
     public void setControlPoints(Vector2d A1, Vector2d A2, Vector2d A3, Vector2d A4, Vector2d B1, Vector2d B2, Vector2d B3, Vector2d B4, Vector2d C1, Vector2d C2, Vector2d C3, Vector2d C4) {
-        beziers[0] = new Bezier(A1, A2, A3, A4);
-        beziers[1] = new Bezier(B1, B2, B3, B4);
-        beziers[2] = new Bezier(C1, C2, C3, C4);
+        beziers[0].setControlPoints(A1, A2, A3, A4);
+        beziers[1].setControlPoints( B1, B2, B3, B4);
+        beziers[2].setControlPoints(C1, C2, C3, C4);
+        calculateTotalArcLength();
     }
 
     public Vector2d getPoint(double T) {
@@ -35,6 +40,10 @@ public class CubicPath {
     public Vector2d getNormalizedNormal(double T) { return beziers[(int) T].getNormalizedNormal(T - Math.floor(T)); }
 
     public double getTotalArcLength() {
+        return totalArcLength;
+    }
+
+    public void calculateTotalArcLength() {
         double total = 0;
         int i = 0;
         for (Bezier bezier : beziers) {
@@ -43,7 +52,7 @@ public class CubicPath {
             arcLengths[i] = length;
             i++;
         }
-        return total;
+        totalArcLength = total;
     }
 
     public int whichBezierFromDistance(double distance) {
