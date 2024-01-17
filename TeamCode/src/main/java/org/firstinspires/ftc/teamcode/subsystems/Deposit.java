@@ -23,7 +23,7 @@ public class Deposit {
 
     public static final Point score = new Point(45,0.22), mid = new Point(165,0.5), transfer = new Point(-45, 0.61);
     private final DualServo swing;
-    private final ServoImplEx end;
+    private final ServoImplEx end, latch;
     //private final EncoderServo end;
     private final VerticalSlide slide;
     private final Telemetry telemetry;
@@ -31,19 +31,23 @@ public class Deposit {
 
     //deposit is end 0.4, swing 0.85
 
+    //end transfer is 1, 0 is deposit
+    //latch 1 is closed, 0 is open
+    //swing 0-1
+    //joystick bounds are 0.5-0.9
     public Deposit(HardwareMap hardwareMap, Telemetry telemetry) {
         ServoImplEx swingL = hardwareMap.get(ServoImplEx.class, "swingL");
         ServoImplEx swingR = hardwareMap.get(ServoImplEx.class, "swingR");
 
-        swingL.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        swingR.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        //swingL.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        //swingR.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         end = hardwareMap.get(ServoImplEx.class, "endS");
         end.setPwmRange(new PwmControl.PwmRange(500, 2500));
         //AnalogInput endEncoder = hardwareMap.get(AnalogInput.class, "endE");
 
-        //latch = hardwareMap.get(ServoImplEx.class, "Dlatch");
-        //latch.setPwmRange(new PwmControl.PwmRange(500,2500));
+        latch = hardwareMap.get(ServoImplEx.class, "Dlatch");
+        latch.setPwmRange(new PwmControl.PwmRange(500,2500));
 
         swing = new DualServo(swingL, swingR);
         //end = new EncoderServo(endServo, endEncoder);
@@ -60,7 +64,7 @@ public class Deposit {
 
     public void setSwingPosition(double target) { swing.setPosition(target); }
 
-    //public void setLatchPosition(double target) { latch.setPosition(target); }
+    public void setLatchPosition(double target) { latch.setPosition(target); }
 
     public void setEndPosition(double target) { end.setPosition(target); }
 
@@ -74,7 +78,7 @@ public class Deposit {
         slide.disabledPIDsetPower(power);
     }
 
-    //public double endPosition(){ return  end.getPosition(); }
+    public double endPosition(){ return  end.getPosition(); }
 
     public void PWMrelease() {
         swing.PWMrelease();
@@ -82,7 +86,7 @@ public class Deposit {
     }
 
     public void setLatch(double position) {
-        //latch.setPosition(position);
+        latch.setPosition(position);
     }
 
     public void activateLatch() {

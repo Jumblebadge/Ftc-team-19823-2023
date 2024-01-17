@@ -28,8 +28,8 @@ public class godMecanum extends LinearOpMode {
 
     FtcDashboard dashboard;
 
-    private double rotation, heading, hzCount = 1, hz = 0;
-    public static double latch=0.825, depositTarget = 0, intakePower = 0, canopee = 0.05;
+    private double rotation, heading, nanoTime = 0, intakePower = 0;
+    public static double latch=0.5, swing = 0.5, end = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -153,16 +153,19 @@ public class godMecanum extends LinearOpMode {
             }
             **/
             //intake.setSlide(intakeTarget);
-            intake.setCanopeePosition(canopee);
-            intake.setLatchPosition(latch);
-            intake.update();
+            //intake.setCanopeePosition(canopee);
+            //intake.setLatchPosition(latch);
+            //intake.update();
 
             //deposit.setSlide(depositTarget);
+            deposit.setLatch(latch);
+            deposit.setSwingPosition(swing);
+            deposit.setEndPosition(end);
             deposit.update();
 
-            telemetry.addData("hz",(hz + 1/hztimer.seconds())/hzCount);
-            hzCount++;
-            hz += 1/hztimer.seconds();
+            double nano = System.nanoTime();
+            telemetry.addData("hz", 1000000000 / (nano - nanoTime));
+            nanoTime = nano;
 
             telemetry.addData("slide", intake.getPosition());
             telemetry.addData("pise",drive.getPose().toString());
