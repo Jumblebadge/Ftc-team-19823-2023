@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class DcMotorExW implements DcMotorEx {
     private final DcMotorEx motor;
-    private double lastPower = 0, powerStep = 0, minimum_power = 0;
+    private double lastPower = 0, powerStep = 0.05, minimum_power = 0.05;
 
     public DcMotorExW(DcMotorEx motor){
         this.motor = motor;
@@ -19,12 +19,12 @@ public class DcMotorExW implements DcMotorEx {
 
     @Override
     public void setPower(double power) {
-        if(Math.abs(power) <= Math.abs(minimum_power)){
-            motor.setPower(0);
-        }
-        else if(Math.abs(power-lastPower)>=powerStep){
+        if(Math.abs(power - lastPower) >= powerStep){
             motor.setPower(power);
             lastPower = power;
+        }
+        if(Math.abs(power) <= Math.abs(minimum_power)){
+            //motor.setPower(0);
         }
     }
 

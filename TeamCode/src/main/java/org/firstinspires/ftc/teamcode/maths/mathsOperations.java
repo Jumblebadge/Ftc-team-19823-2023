@@ -90,4 +90,8 @@ public class mathsOperations {
     public static double cross(Vector2d a, Vector2d b) {
         return a.getX() * b.getY() - a.getY() * b.getX();
     }
+
+    public static Vector2d swapXY(Vector2d vec) {
+        return new Vector2d(vec.getY(), vec.getX());
+    }
 }

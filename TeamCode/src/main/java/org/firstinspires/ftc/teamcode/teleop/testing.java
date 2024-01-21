@@ -14,9 +14,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 import org.firstinspires.ftc.teamcode.maths.GoToPoint;
+import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
@@ -25,9 +27,7 @@ import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-    public Vector2d A1 = new Vector2d(-72,0), A2 = new Vector2d(-72,30), A3 = new Vector2d(-30,30), A4 = new Vector2d(-30,0), B1 = A4, B2 = new Vector2d(-30,-30), B3 = new Vector2d(30, -30), B4 = new Vector2d(30,0), C1 = B4, C2 = new Vector2d(30,30), C3 = new Vector2d(72,30), C4 = new Vector2d(72,0);
-    public static double x = -4, y = 4;
-    public Vector2d Robot = new Vector2d(x,y);
+    public Vector2d A1 = new Vector2d(-45,-60), A2 = new Vector2d(20,-60), A3 = new Vector2d(25,-60), A4 = new Vector2d(25,-45), B1 = A4, B2 = new Vector2d(25,-30), B3 = new Vector2d(25, -30), B4 = new Vector2d(25,-22), C1 = B4, C2 = new Vector2d(25,-14), C3 = new Vector2d(20,-12), C4 = new Vector2d(-45,-12);
     FtcDashboard dashboard;
     private double nanoTime = 0;
 
@@ -41,15 +41,17 @@ public class testing extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
         CubicPath path = new CubicPath(telemetry,A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
-        GVF gvf = new GVF(dashboard,path,1, telemetry);
+        GVF gvf = new GVF(dashboard,path,0.2, telemetry);
 
-        ElapsedTimeW timer = new ElapsedTimeW();
+        drive.setPoseEstimate(new Pose2d(-45,-60,0 ));
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         //Fast loop go brrr
         //PhotonCore.enable();
+
+        PIDcontroller headingPID = new PIDcontroller(0.12,0.001,0,1,0.1);
 
         //Initialize FTCDashboard telemetry
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -58,17 +60,11 @@ public class testing extends LinearOpMode {
         while (opModeIsActive()) {
 
             controlHub.clearBulkCache();
-
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas fieldOverlay = packet.fieldOverlay();
             Pose2d pose = drive.getPose();
-            drawRobot(fieldOverlay, pose);
-            packet.put("x", pose.getX());
-            packet.put("y", pose.getY());
-            packet.put("heading (deg)", Math.toDegrees(pose.getHeading()));
-
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+
+            drive.drive(gvfOut.getY(), gvfOut.getX(), headingPID.pidOut(AngleUnit.normalizeDegrees(-drive.getHeadingInDegrees())));;
 
 
             path.setControlPoints(A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4);
@@ -88,11 +84,4 @@ public class testing extends LinearOpMode {
         }
     }
 
-    public static void drawRobot(Canvas canvas, Pose2d pose) {
-        canvas.strokeCircle(pose.getX(), pose.getY(), 9);
-        Vector2d v = pose.headingVec().times(9);
-        double x1 = pose.getX() + v.getX() / 2, y1 = pose.getY() + v.getY() / 2;
-        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
-        canvas.strokeLine(x1, y1, x2, y2);
-    }
 }

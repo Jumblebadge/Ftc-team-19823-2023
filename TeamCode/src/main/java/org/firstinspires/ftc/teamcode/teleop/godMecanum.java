@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
+import java.util.List;
+
 
 @Config
 @TeleOp(name="mecnuemaen", group="Linear Opmode")
@@ -28,14 +30,13 @@ public class godMecanum extends LinearOpMode {
 
     FtcDashboard dashboard;
 
-    private double rotation, heading, nanoTime = 0, intakePower = 0;
-    public static double latch=0.5, swing = 0.5, end = 0.5;
+    private double rotation, heading, nanoTime = 0, intakePower = 0, hz = 0, count = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
         //Bulk sensor reads
-        LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         //to swerve the mecanum
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
@@ -49,13 +50,18 @@ public class godMecanum extends LinearOpMode {
         ButtonDetector game1rb = new ButtonDetector();
         ButtonDetector game1lb = new ButtonDetector();
         ButtonDetector game2lb = new ButtonDetector();
+        ButtonDetector game2rb = new ButtonDetector();
+        ButtonDetector game2ba = new ButtonDetector();
+        ButtonDetector game2st = new ButtonDetector();
+        ButtonDetector game2lj = new ButtonDetector();
 
         ElapsedTime hztimer = new ElapsedTime();
+        ElapsedTime actionTimer = new ElapsedTime();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
         //Bulk sensor reads
-        controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
         
         deposit.resetEncoders();
         intake.resetEncoders();
@@ -64,7 +70,7 @@ public class godMecanum extends LinearOpMode {
         while (opModeIsActive()) {
 
             //Clear the cache for better loop times (bulk sensor reads)
-            controlHub.clearBulkCache();
+            for (LynxModule hub : allHubs) { hub.clearBulkCache(); }
 
             //driving gamepad
 
@@ -123,48 +129,35 @@ public class godMecanum extends LinearOpMode {
             if (gamepad2.dpad_up) {
                 intake.setSlide(400);
             }
-            intakePower = gamepad2.left_trigger/2;
+            intakePower = gamepad2.left_trigger/1.5;
             if (game2lb.toggle(gamepad2.left_bumper)) {
                 intakePower *= -1;
             }
             intake.setIntakePower(intakePower);
-            //subsystem gamepad
-            /**
-            if (gamepad2.dpad_right) {
-                game2dl.toFalse();
-                deposit.transfer();
-            }
-            else if (gamepad2.dpad_down) {
-                game2dl.toFalse();
-                deposit.mid();
-            }
-            else if (game2dl.toggle(gamepad2.b)) {
-                deposit.score(gamepad1.right_stick_y);
-            }
 
             if (game2rb.toggle(gamepad2.right_bumper)) {
-                intake.on();
-            }
-            else if (gamepad1.left_bumper) {
-                intake.eject();
+                deposit.setSwingPosition(0.6);
+                deposit.setEndPosition(0.15);
+                actionTimer.reset();
             }
             else {
-                intake.off();
+                deposit.setEndPosition(1);
+                if (actionTimer.seconds() > 0.2) {
+                    deposit.setSwingPosition(0.09);
+                }
             }
-            **/
-            //intake.setSlide(intakeTarget);
-            //intake.setCanopeePosition(canopee);
-            //intake.setLatchPosition(latch);
-            //intake.update();
 
-            //deposit.setSlide(depositTarget);
-            deposit.setLatch(latch);
-            deposit.setSwingPosition(swing);
-            deposit.setEndPosition(end);
+            intake.toggleLatch(game2ba.toggle(gamepad2.back));
+            intake.toggleCanopee(game2lj.toggle(gamepad2.left_stick_button));
+            deposit.toggleLatch(game2st.toggle(gamepad2.start));
+
+            intake.update();
             deposit.update();
 
             double nano = System.nanoTime();
-            telemetry.addData("hz", 1000000000 / (nano - nanoTime));
+            hz += (1000000000 / (nano - nanoTime));
+            count++;
+            telemetry.addData("hz", hz / count);
             nanoTime = nano;
 
             telemetry.addData("slide", intake.getPosition());

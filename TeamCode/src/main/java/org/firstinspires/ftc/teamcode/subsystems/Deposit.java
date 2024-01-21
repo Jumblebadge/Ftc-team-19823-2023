@@ -97,6 +97,11 @@ public class Deposit {
         setLatch(0.4);
     }
 
+    public void toggleLatch(boolean active) {
+        if (active) latch.setPosition(1);
+        else latch.setPosition(0);
+    }
+
     public void score(double adjust) {
         double y = score.y + adjust * 0.12;
         swing.setPosition(y);

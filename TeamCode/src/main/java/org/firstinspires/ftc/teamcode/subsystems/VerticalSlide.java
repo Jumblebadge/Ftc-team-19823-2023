@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 import org.firstinspires.ftc.teamcode.utility.MotorGroup;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
@@ -14,6 +15,7 @@ public class VerticalSlide {
     public final MotorGroup motors;
     private double target;
     private final TouchSensor touch;
+    private final DcMotorExW liftLeft, liftRight;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
     public static final double high = 1700, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
@@ -22,8 +24,11 @@ public class VerticalSlide {
     // 0-1600
 
     public VerticalSlide(HardwareMap hardwareMap){
-        DcMotorEx liftLeft = hardwareMap.get(DcMotorEx.class,"Llift");
-        DcMotorEx liftRight = hardwareMap.get(DcMotorEx.class,"Rlift");
+        liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"Llift"));
+        liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"Rlift"));
+        liftRight.setPowerThresholds(0.05,0.05);
+        liftLeft.setPowerThresholds(0.05,0.05);
+
         touch = hardwareMap.get(TouchSensor.class, "Vtouch");
 
         liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);

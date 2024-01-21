@@ -48,9 +48,9 @@ public class GVF {
         double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
         drawPath(dashboard, path, new Pose2d(Robot.getX(), Robot.getY()));
         if (max > 1) {
-            return new Vector2d(out.getX() / max, out.getY() / max);
+            out = new Vector2d(out.getX() / max, out.getY() / max);
         }
-        return out;
+        return out.div(1);
     }
 
     public void drawPath(FtcDashboard dash, CubicPath path, Pose2d robot) {

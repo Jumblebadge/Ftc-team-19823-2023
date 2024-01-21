@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
+
 public class Intake {
 
     //TODO make this extensive
@@ -16,8 +18,8 @@ public class Intake {
     HorizontalSlide slide;
     ServoImplEx latch, canopee;
 
-    //canopee 0.05 down, 0.6 up, 0.35 5stack
-    //latch 0.6 open, 0.825 closed
+    //canopee 0 down, 0.4 up, 0.? 5stack
+    //latch 0.3 open, 0.45 closed
 
     public Intake(HardwareMap hardwareMap){
         intake = hardwareMap.get(DcMotorEx.class, "intake");
@@ -51,12 +53,22 @@ public class Intake {
 
     public void setCanopeePosition(double target) { canopee.setPosition(target); }
 
+    public void toggleCanopee(boolean active) {
+        if (active) canopee.setPosition(0.05);
+        else canopee.setPosition(0.4);
+    }
+
     public void eject(){
         intake.setPower(-intakePower);
     }
 
     public void off(){
         intake.setPower(0);
+    }
+
+    public void toggleLatch(boolean active) {
+        if (active) latch.setPosition(0.3);
+        else latch.setPosition(0.45);
     }
 
     public void setIntakePower(double power) { intake.setPower(power); }

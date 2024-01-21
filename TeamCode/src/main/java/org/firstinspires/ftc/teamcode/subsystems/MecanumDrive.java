@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
+import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,10 +15,11 @@ import org.firstinspires.ftc.teamcode.utility.TwoWheelTrackingLocalizer;
 public class MecanumDrive implements Driveable{
 
     final private IMU imu;
-    final private TwoWheelTrackingLocalizer odo;
+    final private Localizer odo;
     final private DcMotorExW frontRight, frontLeft, backLeft, backRight;
+    private Pose2d pose = new Pose2d(0,0,0);
     final private Telemetry telemetry;
-    final private boolean isAuto;
+    private double loop = 0;
 
     public MecanumDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean isAuto){
         frontRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontRight"));
@@ -24,30 +27,28 @@ public class MecanumDrive implements Driveable{
         backLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"backLeft"));
         backRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"backRight"));
 
-        frontRight.setPowerThresholds(0.05,0);
-        frontLeft.setPowerThresholds(0.05,0);
-        backLeft.setPowerThresholds(0.05,0);
-        backRight.setPowerThresholds(0.05,0);
+        frontRight.setPowerThresholds(0.05,0.05);
+        frontLeft.setPowerThresholds(0.05,0.05);
+        backLeft.setPowerThresholds(0.05,0.05);
+        backRight.setPowerThresholds(0.05,0.05);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         imu = new IMU(hardwareMap);
 
-        odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
+        if (isAuto) odo = new StandardTrackingWheelLocalizer(hardwareMap);
+        else odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
 
         this.telemetry = telemetry;
-        this.isAuto = isAuto;
     }
 
     public void drive(double x, double y, double rot){
 
         //Update heading of robot
-        Pose2d pose = odo.getPoseEstimate();
         double heading;
-
-        if (isAuto)  heading = pose.getHeading();
-        else heading = imu.getHeadingInRadians();
+        calculatePose();
+        heading = pose.getHeading();
 
         double x1 = Math.cos(heading) * x - Math.sin(heading) * y;
         double y1 = Math.sin(heading) * x + Math.cos(heading) * y;
@@ -62,7 +63,7 @@ public class MecanumDrive implements Driveable{
         telemetry.addData("imu", imu.getHeadingInDegrees());
         telemetry.addData("enc1",frontRight.getCurrentPosition());
         telemetry.addData("enc2",backRight.getCurrentPosition());
-        telemetry.addData("enc3",frontLeft.getCurrentPosition());
+        telemetry.addData("enc3",backLeft.getCurrentPosition());
 
     }
 
@@ -78,8 +79,14 @@ public class MecanumDrive implements Driveable{
         return imu.getHeadingInDegrees();
     }
 
-    public Pose2d getPose() {
+    public void calculatePose() {
         odo.update();
-        return odo.getPoseEstimate();
+        pose = odo.getPoseEstimate();
     }
+
+    public Pose2d getPose() {
+        return pose;
+    }
+
+    public void setPoseEstimate(Pose2d pose) { odo.setPoseEstimate(pose); }
 }
