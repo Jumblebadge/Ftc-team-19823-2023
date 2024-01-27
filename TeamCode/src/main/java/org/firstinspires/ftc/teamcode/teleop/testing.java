@@ -41,7 +41,7 @@ public class testing extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
         CubicPath path = new CubicPath(telemetry,A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
-        GVF gvf = new GVF(dashboard,path,0.2, telemetry);
+        GVF gvf = new GVF(dashboard,path,0.2,10,0.75, telemetry);
 
         drive.setPoseEstimate(new Pose2d(-45,-60,0 ));
 
@@ -64,7 +64,7 @@ public class testing extends LinearOpMode {
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
-            drive.drive(gvfOut.getY(), gvfOut.getX(), headingPID.pidOut(AngleUnit.normalizeDegrees(-drive.getHeadingInDegrees())));;
+            drive.drive(gvfOut.getY(), gvfOut.getX(), headingPID.pidOut(AngleUnit.normalizeDegrees(-drive.getHeadingInDegrees())));
 
 
             path.setControlPoints(A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4);

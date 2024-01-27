@@ -14,18 +14,23 @@ public class GVF {
     CubicPath path;
     Vector2d R, closestPoint, out;
     FtcDashboard dashboard;
-    double Kn;
+    double Kn, Kf, Ks;
     Telemetry telemetry;
 
-    public GVF(FtcDashboard dashboard, CubicPath path, double Kn, Telemetry telemetry) {
+
+    public GVF(FtcDashboard dashboard, CubicPath path, double Kn, double Kf, double Ks, Telemetry telemetry) {
         this.path = path;
         this.Kn = Kn;
+        this.Kf = Kf;
+        this.Ks = Ks;
         this.dashboard = dashboard;
         this.telemetry = telemetry;
     }
 
-    public void setKn(double Kn) {
+    public void tune(double Kn, double Kf, double Ks) {
         this.Kn = Kn;
+        this.Kf = Kf;
+        this.Ks = Ks;
     }
 
     public double calculateError(Vector2d tangent) {
@@ -50,7 +55,8 @@ public class GVF {
         if (max > 1) {
             out = new Vector2d(out.getX() / max, out.getY() / max);
         }
-        return out.div(1);
+        out = out.times(Math.min(1,(path.getTotalArcLength() - path.arcLength) / Kf));
+        return out.times(Ks);
     }
 
     public void drawPath(FtcDashboard dash, CubicPath path, Pose2d robot) {

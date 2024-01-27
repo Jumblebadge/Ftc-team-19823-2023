@@ -38,10 +38,16 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.ServoConfigurationType;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.maths.mathsOperations;
 
 //copied from the sdk. wrapper to limit hardware calls
 public class ServoImplExW extends ServoImpl implements PwmControl
 {
+
+    private double lastPosition = 0;
+    private double positionThreshold = 0.01;
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
@@ -74,6 +80,23 @@ public class ServoImplExW extends ServoImpl implements PwmControl
         controllerEx.setServoPwmRange(this.getPortNumber(), range);
     }
 
+    //things I added
+
+    public void setPositionThreshold(double positionThreshold) { this.positionThreshold = positionThreshold; }
+
+    @Override
+    public void setPosition(double position) {
+        if (!mathsOperations.equals(position, lastPosition, positionThreshold)) {
+            position = Range.clip(position, MIN_POSITION, MAX_POSITION);
+            if (direction == Direction.REVERSE) position = reverse(position);
+            double scaled = Range.scale(position, MIN_POSITION, MAX_POSITION, limitPositionMin, limitPositionMax);
+            internalSetPosition(scaled);
+            lastPosition = position;
+        }
+    }
+
+    //default servo things
+
     @Override
     public PwmRange getPwmRange()
     {
@@ -96,5 +119,9 @@ public class ServoImplExW extends ServoImpl implements PwmControl
     public boolean isPwmEnabled()
     {
         return controllerEx.isServoPwmEnabled(this.getPortNumber());
+    }
+
+    private double reverse(double position) {
+        return MAX_POSITION - position + MIN_POSITION;
     }
 }
