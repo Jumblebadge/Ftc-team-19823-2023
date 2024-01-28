@@ -25,5 +25,7 @@ public class ButtonDetector {
     }
 
     public void toTrue()  { current = true;  }
+
+    public boolean getState() { return current; }
 }
 

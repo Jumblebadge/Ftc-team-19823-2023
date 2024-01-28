@@ -37,91 +37,43 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.hardware.ServoImpl;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.ServoConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.maths.mathsOperations;
 
 //copied from the sdk. wrapper to limit hardware calls
-public class ServoImplExW extends ServoImpl implements PwmControl
+public class ServoImplExW
 {
 
     private double lastPosition = 0;
-    private double positionThreshold = 0.01;
-    //----------------------------------------------------------------------------------------------
-    // State
-    //----------------------------------------------------------------------------------------------
+    private double positionStep = 0.01;
+    private final ServoImplEx servo;
 
-    protected ServoControllerEx controllerEx;
-
-    //----------------------------------------------------------------------------------------------
-    // Construction
-    //----------------------------------------------------------------------------------------------
-
-    public ServoImplExW(ServoControllerEx controller, int portNumber, @NonNull ServoConfigurationType servoType)
-    {
-        this(controller, portNumber, Direction.FORWARD, servoType);
+    public ServoImplExW(ServoImplEx servo) {
+        this.servo = servo;
     }
 
-    public ServoImplExW(ServoControllerEx controller, int portNumber, Direction direction, @NonNull ServoConfigurationType servoType)
-    {
-        super(controller, portNumber, direction);
-        this.controllerEx = controller;
-        controllerEx.setServoType(portNumber, servoType);
-    }
+    public void setPositionThreshold(double positionThreshold) { this.positionStep = positionThreshold; }
 
-    //----------------------------------------------------------------------------------------------
-    // PwmControl
-    //----------------------------------------------------------------------------------------------
-
-    @Override
-    public void setPwmRange(PwmRange range)
-    {
-        controllerEx.setServoPwmRange(this.getPortNumber(), range);
-    }
-
-    //things I added
-
-    public void setPositionThreshold(double positionThreshold) { this.positionThreshold = positionThreshold; }
-
-    @Override
     public void setPosition(double position) {
-        if (!mathsOperations.equals(position, lastPosition, positionThreshold)) {
-            position = Range.clip(position, MIN_POSITION, MAX_POSITION);
-            if (direction == Direction.REVERSE) position = reverse(position);
-            double scaled = Range.scale(position, MIN_POSITION, MAX_POSITION, limitPositionMin, limitPositionMax);
-            internalSetPosition(scaled);
+        if(Math.abs(position - lastPosition) >= positionStep){
+            servo.setPosition(position);
             lastPosition = position;
         }
     }
 
-    //default servo things
-
-    @Override
-    public PwmRange getPwmRange()
-    {
-        return controllerEx.getServoPwmRange(this.getPortNumber());
+    public void setPwmDisable() {
+        servo.setPwmDisable();
     }
 
-    @Override
-    public void setPwmEnable()
-    {
-        controllerEx.setServoPwmEnable(this.getPortNumber());
+    public double getPosition() {
+        return servo.getPosition();
     }
 
-    @Override
-    public void setPwmDisable()
-    {
-        controllerEx.setServoPwmDisable(this.getPortNumber());
+    public void setPwmRange(PwmControl.PwmRange range) {
+        servo.setPwmRange(range);
     }
 
-    @Override
-    public boolean isPwmEnabled()
-    {
-        return controllerEx.isServoPwmEnabled(this.getPortNumber());
-    }
-
-    private double reverse(double position) {
-        return MAX_POSITION - position + MIN_POSITION;
-    }
 }

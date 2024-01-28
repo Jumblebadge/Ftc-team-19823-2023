@@ -37,7 +37,7 @@ public class TimedRedRight extends LinearOpMode {
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
-        //deposit.transfer();
+        //deposit.mid1();
 
         waitForStart();
         timer.reset();

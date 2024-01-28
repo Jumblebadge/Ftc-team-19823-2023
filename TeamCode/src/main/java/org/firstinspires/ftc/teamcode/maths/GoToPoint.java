@@ -24,8 +24,8 @@ public class GoToPoint {
     private double distanceNow, headingError;
     private final ElapsedTimeW profileTime = new ElapsedTimeW();
     private final PIDcontroller headingPID = new PIDcontroller(6,0,5,0, 0.1);
-    private final PIDcontroller xPID = new PIDcontroller(1,0,6.5,0, 0.1);
-    private final PIDcontroller yPID = new PIDcontroller(1,0,6.5,0, 0.1);
+    private final PIDcontroller xPID = new PIDcontroller(1,0,0,1, 0.1);
+    private final PIDcontroller yPID = new PIDcontroller(1,0,0,1, 0.1);
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0, 0, 0), new MotionState(1, 0, 0), 2, 3,4);
 
     public GoToPoint(Driveable driver, Telemetry telemetry, FtcDashboard dashboard){
@@ -84,6 +84,34 @@ public class GoToPoint {
         telemetry.addData("statepointY",statePoint.y);
         telemetry.addData("xerror",distanceToState*Math.cos(angleToEndPoint)-(pose.getX()-startPose.getX()));
         telemetry.addData("yerror",distanceToState*Math.sin(angleToEndPoint)-(pose.getY()-startPose.getY()));
+    }
+
+    public void driveToPointWithoutProfile(Pose2d pose,Pose2d desiredPose) {
+        distanceNow = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
+        //angle from start to finish
+        double angleToEndPoint = Math.atan2(desiredPose.getY()-pose.getY(),desiredPose.getX()-pose.getX());
+        //create a point from the motion profile output, which is normally just a distance value
+        double distanceToState = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
+        //use pid on x and y position to move towards the target point determined by the state
+        //distanceToState * sin or cos of the angle to end point will give the x or y component of the distance vector, which ensures that x and y arrive at the same time. pose-startpos is the current state
+        double xOut = xPID.pidOut(distanceToState * Math.cos(angleToEndPoint));
+        double yOut = yPID.pidOut(distanceToState * Math.sin(angleToEndPoint));
+        headingError = AngleUnit.normalizeRadians(desiredPose.getHeading()-pose.getHeading());
+        double headingOut = headingPID.pidOut(headingError);
+        //feed the pid output into swerve kinematics and draw the robot on FTCdash field
+        driver.drive(yOut,xOut,-headingOut);
+        //drawField(pose,desiredPose,startPose,dashboard);
+
+        isDone = profile.duration() < profileTime.seconds();
+
+
+        telemetry.addData("distanceToProfile",distanceToState);
+        telemetry.addData("distanceNow: ",distanceNow);
+        telemetry.addData("angleToEndPoint: ", angleToEndPoint);
+        telemetry.addData("xOut: ", xOut);
+        telemetry.addData("yOut: ", yOut);
+        telemetry.addData("xerror",distanceToState*Math.cos(angleToEndPoint));
+        telemetry.addData("yerror",distanceToState*Math.sin(angleToEndPoint));
     }
 
     public boolean isTimeDone(){

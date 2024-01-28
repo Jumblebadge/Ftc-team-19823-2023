@@ -69,7 +69,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     @Override
     public double getHeading() {
-        return imu.getHeadingInRadians();
+        return -imu.getHeadingInRadians();
     }
 
     @NonNull

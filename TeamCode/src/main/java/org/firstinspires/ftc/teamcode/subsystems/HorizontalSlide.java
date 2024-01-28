@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.MotorGroup;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class HorizontalSlide {
@@ -18,8 +17,8 @@ public class HorizontalSlide {
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double out = 1700, mid = 300, transfer = 100, in = 0;
-    private double currentHeight = in, offset = 0;
+    public static final double in = 0, mid1 = 200, mid2 = 400, out = 600;
+    public static double currentState = in, offset = 0;
 
     // 0-1100
 
@@ -50,6 +49,7 @@ public class HorizontalSlide {
     public double getPosition() { return motor.getCurrentPosition() + offset; }
 
     public boolean isTimeDone() { return profile.getProfileDuration() < profile.getCurrentTime(); }
+
     public boolean isPositionDone() { return Math.abs(getError()) < 10; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
@@ -78,28 +78,28 @@ public class HorizontalSlide {
         this.offset = offset;
     }
 
-    public void zero(){
+    public void in(){
         moveTo(in);
-        currentHeight = in;
+        currentState = in;
     }
 
-    public void transfer(){
-        moveTo(transfer);
-        currentHeight = transfer;
+    public void mid1(){
+        moveTo(mid1);
+        currentState = mid1;
     }
 
-    public void mid(){
-        moveTo(mid);
-        currentHeight = mid;
+    public void mid2(){
+        moveTo(mid2);
+        currentState = mid2;
     }
 
-    public void high(){
+    public void out(){
         moveTo(out);
-        currentHeight = out;
+        currentState = out;
     }
 
-    public double returnPole() {
-        return currentHeight;
+    public double returnState() {
+        return currentState;
     }
 
 }

@@ -18,8 +18,8 @@ public class VerticalSlide {
     private final DcMotorExW liftLeft, liftRight;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double high = 1700, mid = 400, transfer = 276.333333333, autotransfer = 300, zero = 0;
-    private double currentHeight = zero, offset = 0;
+    public static final double in = 0, mid1 = 400, mid2 = 700, out = 1200;
+    private double currentState = in, offset = 0;
 
     // 0-1600
 
@@ -60,6 +60,7 @@ public class VerticalSlide {
     public double getPosition() { return motors.getPosition(0) + offset; }
 
     public boolean isTimeDone() { return profile.getProfileDuration() < profile.getCurrentTime(); }
+
     public boolean isPositionDone() { return Math.abs(getError()) < 10; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
@@ -90,28 +91,28 @@ public class VerticalSlide {
         this.offset = offset;
     }
 
-    public void zero(){
-        moveTo(zero);
-        currentHeight = zero;
+    public void in(){
+        moveTo(in);
+        currentState = in;
     }
 
-    public void transfer(){
-        moveTo(transfer);
-        currentHeight = transfer;
+    public void mid1(){
+        moveTo(mid1);
+        currentState = mid1;
     }
 
-    public void mid(){
-        moveTo(mid);
-        currentHeight = mid;
+    public void mid2(){
+        moveTo(mid2);
+        currentState = mid2;
     }
 
-    public void high(){
-        moveTo(high);
-        currentHeight = high;
+    public void out(){
+        moveTo(out);
+        currentState = out;
     }
 
-    public double returnPole() {
-        return currentHeight;
+    public double returnState() {
+        return currentState;
     }
 
 }

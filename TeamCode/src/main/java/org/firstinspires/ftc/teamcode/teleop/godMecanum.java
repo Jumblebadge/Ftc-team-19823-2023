@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 
@@ -40,23 +41,23 @@ public class godMecanum extends LinearOpMode {
 
         //to swerve the mecanum
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
-        Deposit deposit = new Deposit(hardwareMap, telemetry);
+        Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        ButtonDetector game1a  = new ButtonDetector();
-        ButtonDetector game1rb = new ButtonDetector();
-        ButtonDetector game1lb = new ButtonDetector();
-        ButtonDetector game2lb = new ButtonDetector();
-        ButtonDetector game2rb = new ButtonDetector();
-        ButtonDetector game2ba = new ButtonDetector();
-        ButtonDetector game2st = new ButtonDetector();
-        ButtonDetector game2lj = new ButtonDetector();
+        ButtonDetector headingPIDtoggle  = new ButtonDetector();
+        ButtonDetector setHeadingTarget = new ButtonDetector();
+        ButtonDetector zeroHeadingPID = new ButtonDetector();
+        ButtonDetector intakeReverse = new ButtonDetector();
+        ButtonDetector depositMovement = new ButtonDetector();
+        ButtonDetector depositLatch = new ButtonDetector();
+        ButtonDetector canopeeToggle = new ButtonDetector();
 
-        ElapsedTime hztimer = new ElapsedTime();
-        ElapsedTime actionTimer = new ElapsedTime();
+        ButtonDetector rumble = new ButtonDetector();
+
+        ElapsedTime swingTimer = new ElapsedTime();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
@@ -74,18 +75,18 @@ public class godMecanum extends LinearOpMode {
 
             //driving gamepad
 
-            if (game1a.toggle(gamepad1.a)) {
+            if (headingPIDtoggle.toggle(gamepad1.a)) {
                 rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeadingInDegrees()));
             }
             else { rotation = 0; }
 
-            if (game1rb.risingEdge(gamepad1.right_bumper)) {
+            if (setHeadingTarget.risingEdge(gamepad1.right_bumper)) {
                 heading = drive.getHeading();
             }
 
-            if (game1lb.risingEdge(gamepad1.left_bumper)) {
+            if (zeroHeadingPID.risingEdge(gamepad1.left_bumper)) {
                 heading = 0;
-                game1a.toTrue();
+                headingPIDtoggle.toTrue();
             }
 
             if (gamepad1.b) {
@@ -105,51 +106,63 @@ public class godMecanum extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
 
             if (gamepad2.a) {
-                deposit.setSlide(0);
+                deposit.in();
+                intake.in();
             }
             if (gamepad2.b) {
-                deposit.setSlide(400);
+                deposit.mid1();
             }
             if (gamepad2.x) {
-                deposit.setSlide(800);
+                deposit.mid2();
+                intake.mid1();
             }
             if (gamepad2.y) {
-                deposit.setSlide(1200);
+                //deposit.out();
             }
 
             if (gamepad2.dpad_down) {
-                intake.setSlide(0);
+                intake.in();
             }
             if (gamepad2.dpad_right) {
-                intake.setSlide(100);
+                intake.mid1();
             }
             if (gamepad2.dpad_left) {
-                intake.setSlide(200);
+                intake.mid2();
             }
             if (gamepad2.dpad_up) {
-                intake.setSlide(400);
+                intake.out();
             }
             intakePower = gamepad2.left_trigger/1.5;
-            if (game2lb.toggle(gamepad2.left_bumper)) {
+            if (intakeReverse.toggle(gamepad2.left_bumper)) {
                 intakePower *= -1;
             }
             intake.setIntakePower(intakePower);
 
-            if (game2rb.toggle(gamepad2.right_bumper)) {
-                deposit.setSwingPosition(0.6);
-                deposit.setEndPosition(0.15);
-                actionTimer.reset();
+            if (depositMovement.toggle(gamepad2.right_bumper)) {
+                deposit.setSwingPosition(deposit.SWING_OUT);
+                deposit.setEndPosition(deposit.END_OUT);
+                swingTimer.reset();
             }
             else {
-                deposit.setEndPosition(1);
-                if (actionTimer.seconds() > 0.2) {
-                    deposit.setSwingPosition(0.09);
+                deposit.setEndPosition(deposit.END_IN);
+                if (swingTimer.seconds() > 0.2) {
+                    if (/*intake.currentState() == HorizontalSlide.in && */deposit.currentState() == VerticalSlide.in /*&& intake.isSlideDone()*/ && deposit.isSlideDone()) {
+                        deposit.setSwingPosition(deposit.SWING_TRANSFER);
+                    }
+                    else deposit.setSwingPosition(deposit.SWING_WAIT);
                 }
             }
+            telemetry.addData("intake",intake.isSlideDone());
+            telemetry.addData("deposit", deposit.isSlideDone());
 
-            intake.toggleLatch(game2ba.toggle(gamepad2.back));
-            intake.toggleCanopee(game2lj.toggle(gamepad2.left_stick_button));
-            deposit.toggleLatch(game2st.toggle(gamepad2.start));
+            //intake.toggleLatch(intakeLatch.toggle(gamepad2.back));
+            intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
+            deposit.toggleLatch(depositLatch.toggle(gamepad2.triangle));
+
+            if (rumble.risingEdge(gamepad2.triangle)) {
+                gamepad2.rumble(100);
+            }
+
 
             intake.update();
             deposit.update();
@@ -162,7 +175,6 @@ public class godMecanum extends LinearOpMode {
 
             telemetry.addData("slide", intake.getPosition());
             telemetry.addData("pise",drive.getPose().toString());
-            hztimer.reset();
             telemetry.update();
         }
     }

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.utility.DualServo;
+import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 
 public class Swing {
 
@@ -12,8 +13,8 @@ public class Swing {
     private final DualServo swing;
 
     public Swing(HardwareMap hardwareMap) {
-        ServoImplEx swingL = hardwareMap.get(ServoImplEx.class, "swingL");
-        ServoImplEx swingR = hardwareMap.get(ServoImplEx.class, "swingR");
+        ServoImplExW swingL = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "swingL"));
+        ServoImplExW swingR = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "swingR"));
 
         swingL.setPwmRange(new PwmControl.PwmRange(500, 2500));
         swingR.setPwmRange(new PwmControl.PwmRange(500, 2500));

@@ -6,11 +6,11 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class DualServo {
 
-    private final ServoImplEx servo1, servo2;
+    private final ServoImplExW servo1, servo2;
     private final RunMotionProfile profile = new RunMotionProfile(0.1,0.1,0.1,0,0,0,0, 100);
     private double lastTarget;
 
-    public DualServo(ServoImplEx servo2, ServoImplEx servo1){
+    public DualServo(ServoImplExW servo2, ServoImplExW servo1){
         this.servo1 = servo1;
         this.servo2 = servo2;
     }

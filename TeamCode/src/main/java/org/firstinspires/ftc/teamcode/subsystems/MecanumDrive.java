@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 import org.firstinspires.ftc.teamcode.utility.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.utility.TwoWheelTrackingLocalizer;
@@ -20,6 +21,7 @@ public class MecanumDrive implements Driveable{
     private Pose2d pose = new Pose2d(0,0,0);
     final private Telemetry telemetry;
     private double loop = 0;
+    private boolean isAuto;
 
     public MecanumDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean isAuto){
         frontRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"frontRight"));
@@ -39,6 +41,7 @@ public class MecanumDrive implements Driveable{
 
         if (isAuto) odo = new StandardTrackingWheelLocalizer(hardwareMap);
         else odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
+        this.isAuto = isAuto;
 
         this.telemetry = telemetry;
     }
@@ -48,7 +51,8 @@ public class MecanumDrive implements Driveable{
         //Update heading of robot
         double heading;
         calculatePose();
-        heading = pose.getHeading();
+        if (!isAuto) heading = AngleUnit.normalizeDegrees( -pose.getHeading());
+        else heading = AngleUnit.normalizeDegrees(pose.getHeading());
 
         double x1 = Math.cos(heading) * x - Math.sin(heading) * y;
         double y1 = Math.sin(heading) * x + Math.cos(heading) * y;

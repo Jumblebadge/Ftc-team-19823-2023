@@ -23,6 +23,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 
 
 @Config
+@Disabled
 @Autonomous(name="Red Right", group="Linear Opmode")
 public class PIDRedRight extends LinearOpMode {
 
@@ -63,7 +64,7 @@ public class PIDRedRight extends LinearOpMode {
         portal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), processor);
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
-        Deposit deposit = new Deposit(hardwareMap, telemetry);
+        Deposit deposit = new Deposit(hardwareMap);
 
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
@@ -138,7 +139,7 @@ public class PIDRedRight extends LinearOpMode {
                     }
                     if (auto.isPositionDone() && taskNumber == 1) {
                         deposit.setSlide(400);
-                        deposit.score(0);
+                        //deposit.score(0);
                         if (deposit.isSlideDone()) {
                             deposit.disableLatch();
                             taskNumber++;
