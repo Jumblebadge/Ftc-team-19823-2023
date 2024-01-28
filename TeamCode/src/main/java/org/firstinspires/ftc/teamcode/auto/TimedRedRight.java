@@ -32,7 +32,7 @@ public class TimedRedRight extends LinearOpMode {
         ElapsedTime hztimer = new ElapsedTime();
         ElapsedTime timer = new ElapsedTime();
 
-        PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
+        PIDcontroller headingPID = new PIDcontroller(0.1,0.001,0,0.75,0.1);
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -48,11 +48,11 @@ public class TimedRedRight extends LinearOpMode {
 
             rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeadingInDegrees()));
 
-            if (timer.seconds() < 0.55) {
+            if (timer.seconds() < 0.3) {
                 drive.drive(-0.5, 0, rotation);
             }
             else if (timer.seconds() < 2.5) {
-                drive.drive(-0, -0.35, rotation);
+                drive.drive(-0, -0.3, rotation);
             }
             else if (timer.seconds() > 4) {
                 heading = 90;

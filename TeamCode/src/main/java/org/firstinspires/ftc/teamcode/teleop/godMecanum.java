@@ -176,7 +176,7 @@ public class godMecanum extends LinearOpMode {
             deposit.toggleLatch(depositLatch.toggle(gamepad2.triangle));
 
             if (rumble.risingEdge(gamepad2.triangle)) {
-                gamepad2.rumble(100);
+                if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
             }
 
 

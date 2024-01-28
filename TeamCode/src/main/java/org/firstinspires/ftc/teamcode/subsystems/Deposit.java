@@ -22,12 +22,9 @@ public class Deposit {
     private final VerticalSlide slide;
     public final double LATCH_CLOSED = 1, LATCH_OPEN = 0;
     public final double END_IN = 1, END_OUT = 0.175;
-    public final double SWING_OUT = 0.6, SWING_TRANSFER = 0.07, SWING_WAIT = 0.09;
+    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.19, SWING_WAIT = 0.24;
+    // x, x-0.51, x-0.46
 
-    //end mid1 is 1, 0 is deposit
-    //latch 1 is closed, 0 is open
-    //swing 0-1
-    //joystick bounds are 0.5-0.9
     public Deposit(HardwareMap hardwareMap) {
         ServoImplExW swingL = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "swingL"));
         ServoImplExW swingR = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "swingR"));
@@ -89,8 +86,12 @@ public class Deposit {
     }
 
     public void toggleLatch(boolean active) {
-        if (active) latch.setPosition(1);
-        else latch.setPosition(0);
+        if (active) latch.setPosition(LATCH_CLOSED);
+        else latch.setPosition(LATCH_OPEN);
+    }
+
+    public double latchPosition() {
+        return latch.getPosition();
     }
 
     public void in() { slide.in(); }
