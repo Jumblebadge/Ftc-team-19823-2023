@@ -49,7 +49,10 @@ public class godMecanum extends LinearOpMode {
 
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
         ButtonDetector setHeadingTarget = new ButtonDetector();
-        ButtonDetector zeroHeadingPID = new ButtonDetector();
+        ButtonDetector headingTo270 = new ButtonDetector();
+        ButtonDetector headingTo180 = new ButtonDetector();
+        ButtonDetector headingTo90 = new ButtonDetector();
+        ButtonDetector headingTo0 = new ButtonDetector();
         ButtonDetector intakeReverse = new ButtonDetector();
         ButtonDetector depositMovement = new ButtonDetector();
         ButtonDetector depositLatch = new ButtonDetector();
@@ -80,14 +83,27 @@ public class godMecanum extends LinearOpMode {
             }
             else { rotation = 0; }
 
-            if (setHeadingTarget.risingEdge(gamepad1.right_bumper)) {
+            if (setHeadingTarget.risingEdge(gamepad1.x)) {
                 heading = drive.getHeading();
             }
 
-            if (zeroHeadingPID.risingEdge(gamepad1.left_bumper)) {
+            if (headingTo0.risingEdge(gamepad1.dpad_up)) {
                 heading = 0;
                 headingPIDtoggle.toTrue();
             }
+            if (headingTo90.risingEdge(gamepad1.dpad_right)) {
+                heading = 90;
+                headingPIDtoggle.toTrue();
+            }
+            if (headingTo180.risingEdge(gamepad1.dpad_down)) {
+                heading = 180;
+                headingPIDtoggle.toTrue();
+            }
+            if (headingTo270.risingEdge(gamepad1.dpad_left)) {
+                heading = -90;
+                headingPIDtoggle.toTrue();
+            }
+
 
             if (gamepad1.b) {
                 drive.resetIMU();
