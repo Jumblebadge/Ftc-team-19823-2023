@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class ServoGroup {
 
-    public final ServoImplEx[] servos;
-    public ServoGroup(ServoImplEx... servos){
+    public final ServoImplExW[] servos;
+    public ServoGroup(ServoImplExW... servos){
         this.servos = servos;
     }
 
@@ -24,7 +24,7 @@ public class ServoGroup {
     }
 
     public void PWMrelease() {
-        for (ServoImplEx servo : servos) {
+        for (ServoImplExW servo : servos) {
             servo.setPwmDisable();
         }
     }

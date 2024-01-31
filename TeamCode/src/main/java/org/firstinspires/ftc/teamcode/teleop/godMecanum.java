@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -61,6 +62,7 @@ public class godMecanum extends LinearOpMode {
         ButtonDetector rumble = new ButtonDetector();
 
         ElapsedTime swingTimer = new ElapsedTime();
+        ElapsedTimeW test = new ElapsedTimeW();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
@@ -190,6 +192,7 @@ public class godMecanum extends LinearOpMode {
             nanoTime = nano;
 
             telemetry.addData("slide", intake.getPosition());
+            telemetry.addData("test",test.seconds());
             telemetry.addData("pise",drive.getPose().toString());
             telemetry.update();
         }

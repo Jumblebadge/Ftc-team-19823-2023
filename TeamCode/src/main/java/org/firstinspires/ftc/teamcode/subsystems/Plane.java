@@ -4,13 +4,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
+
 public class Plane {
 
-    private final ServoImplEx plane;
+    private final ServoImplExW plane;
     public final double hold = 0.5, release = 0.5;
 
     public Plane(HardwareMap hardwareMap){
-        plane = hardwareMap.get(ServoImplEx.class, "plane");
+        plane = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "plane"));
         plane.setPwmRange(new PwmControl.PwmRange(500, 2500));
     }
 

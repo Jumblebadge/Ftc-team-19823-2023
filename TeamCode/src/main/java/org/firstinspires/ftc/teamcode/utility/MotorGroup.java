@@ -6,10 +6,10 @@ import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 
 public class MotorGroup {
 
-    public final DcMotorEx[] motors;
+    public final DcMotorExW[] motors;
     private final PIDcontroller controller = new PIDcontroller(0,0,0,0,100);
 
-    public MotorGroup(DcMotorEx... motors){
+    public MotorGroup(DcMotorExW... motors){
         this.motors = motors;
     }
 

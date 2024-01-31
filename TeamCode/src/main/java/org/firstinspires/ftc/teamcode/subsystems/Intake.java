@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 
 public class Intake {
 
     //TODO make this extensive
 
-    private final DcMotorEx intake;
+    private final DcMotorExW intake;
     private final double intakePower = 1;
     HorizontalSlide slide;
     ServoImplExW latch, canopee;
@@ -24,7 +25,7 @@ public class Intake {
     //latch 0.3 open, 0.45 closed
 
     public Intake(HardwareMap hardwareMap){
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "intake"));
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 

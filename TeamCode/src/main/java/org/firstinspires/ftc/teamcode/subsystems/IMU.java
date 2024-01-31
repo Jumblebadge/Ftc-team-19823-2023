@@ -14,9 +14,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 public class IMU {
 
     private final BNO055IMU imu;
-    private double imuOffset = 0;
+    private final int interval;
+    private double imuOffset = 0, count = 0, lastRead = 0;
+    private Orientation angles;
 
-    public IMU(HardwareMap hardwareMap) {
+    public IMU(HardwareMap hardwareMap, int interval) {
+        this.interval = interval;
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -29,12 +33,23 @@ public class IMU {
     }
 
     public double getHeadingInDegrees() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        /*
+        if (count >= interval) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            count++;
+        }
+
+        assert angles != null;
+        lastRead = AngleUnit.normalizeDegrees(angles.firstAngle * -1 - imuOffset);
+        return lastRead;
+         */
+        //TODO finish this
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return AngleUnit.normalizeDegrees(angles.firstAngle * -1 - imuOffset);
     }
 
     public double getHeadingInRadians() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         return AngleUnit.normalizeRadians(angles.firstAngle + Math.toRadians(imuOffset));
     }
 

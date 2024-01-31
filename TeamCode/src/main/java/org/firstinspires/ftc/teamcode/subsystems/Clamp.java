@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.utility.ServoGroup;
+import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 
 public class Clamp {
 
@@ -13,8 +14,8 @@ public class Clamp {
 
     public Clamp(HardwareMap hardwareMap){
 
-        ServoImplEx clampL = hardwareMap.get(ServoImplEx.class, "clampL");
-        ServoImplEx clampR = hardwareMap.get(ServoImplEx.class, "clampR");
+        ServoImplExW clampL = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "clampL"));
+        ServoImplExW clampR = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "clampR"));
 
         clampL.setPwmRange(new PwmControl.PwmRange(500, 2500));
         clampR.setPwmRange(new PwmControl.PwmRange(500, 2500));

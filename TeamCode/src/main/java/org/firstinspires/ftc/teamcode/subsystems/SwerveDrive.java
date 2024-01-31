@@ -50,7 +50,7 @@ public class SwerveDrive {
         mod2m2.setDirection(DcMotorSimple.Direction.REVERSE);
         mod3m2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        imu = new IMU(hardwareMap);
+        imu = new IMU(hardwareMap,1);
 
         this.telemetry = telemetry;
         this.eff = eff;

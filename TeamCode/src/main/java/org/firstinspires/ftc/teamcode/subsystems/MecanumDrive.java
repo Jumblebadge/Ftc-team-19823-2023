@@ -37,7 +37,7 @@ public class MecanumDrive implements Driveable{
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        imu = new IMU(hardwareMap);
+        imu = new IMU(hardwareMap,1);
 
         if (isAuto) odo = new StandardTrackingWheelLocalizer(hardwareMap);
         else odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
