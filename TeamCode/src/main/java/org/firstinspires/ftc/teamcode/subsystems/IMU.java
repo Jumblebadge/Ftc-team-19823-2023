@@ -14,13 +14,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 public class IMU {
 
     private final BNO055IMU imu;
-    private final int interval;
-    private double imuOffset = 0, count = 0, lastRead = 0;
-    private Orientation angles;
+    private double imuOffset = 0, count = 0;
+    private Orientation angle;
 
-    public IMU(HardwareMap hardwareMap, int interval) {
-        this.interval = interval;
-
+    public IMU(HardwareMap hardwareMap) {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -30,27 +27,24 @@ public class IMU {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
+        updateHeading(0);
     }
 
     public double getHeadingInDegrees() {
-        /*
-        if (count >= interval) {
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            count++;
-        }
-
-        assert angles != null;
-        lastRead = AngleUnit.normalizeDegrees(angles.firstAngle * -1 - imuOffset);
-        return lastRead;
-         */
-        //TODO finish this
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return AngleUnit.normalizeDegrees(angles.firstAngle * -1 - imuOffset);
+        return AngleUnit.normalizeDegrees(angle.firstAngle * -1 - imuOffset);
     }
 
     public double getHeadingInRadians() {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-        return AngleUnit.normalizeRadians(angles.firstAngle + Math.toRadians(imuOffset));
+        return AngleUnit.normalizeRadians(angle.firstAngle + Math.toRadians(imuOffset));
+    }
+
+    public void updateHeading(int interval) {
+        if (count >= interval - 1) {
+            angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            count = 0;
+        }
+        else count++;
     }
 
     public void setImuOffset(double offset) {
