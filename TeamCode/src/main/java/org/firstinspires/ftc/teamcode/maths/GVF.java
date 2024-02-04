@@ -22,7 +22,8 @@ public class GVF {
     PIDcontroller xPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     PIDcontroller yPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
-    Vector2d temp;
+    Vector2d temp = new Vector2d(0,0);
+    int count = 0;
     Telemetry telemetry;
 
 
@@ -33,7 +34,7 @@ public class GVF {
         this.Ks = Ks;
         this.dashboard = dashboard;
         this.telemetry = telemetry;
-        calculateGVF(PathList.RedLeftPathToSpikePoints[0]);
+        calculateGVF(this.path.getControlPoint(0));
     }
 
     public void setPath(CubicPath path) {
@@ -49,11 +50,14 @@ public class GVF {
     public double calculateError(Vector2d tangent) {
         double magnitudeOfR = R.distTo(new Vector2d(0,0));
         magnitudeOfR = Math.pow(1.3, magnitudeOfR - 10) - 0.073;
-        return magnitudeOfR * -(Math.signum(mathsOperations.cross(R,tangent)));
+        magnitudeOfR *= -(Math.signum(mathsOperations.cross(R,tangent)));
+        if (Math.abs(magnitudeOfR) > 100) return R.distTo(new Vector2d(0,0)) * -(Math.signum(mathsOperations.cross(R,tangent)));
+        return magnitudeOfR;
     }
 
     public void calculateEverything(Vector2d Robot) {
         closestPoint = path.findClosestPointOnPath(Robot);
+        telemetry.addData("closestPoind",closestPoint);
         R = new Vector2d(Robot.getX() - closestPoint.getX(), Robot.getY() - closestPoint.getY());
     }
 
@@ -64,6 +68,8 @@ public class GVF {
     public boolean isEnding() { return distanceFromEnd() < Kf; }
 
     public Vector2d calculateGVF(Vector2d Robot) {
+        count++;
+        temp = Robot;
         calculateEverything(Robot);
         tangent = path.getNormalizedTangent(path.guessT);
         Vector2d normal = path.getNormalizedNormal(path.guessT);
@@ -76,13 +82,18 @@ public class GVF {
         }
         out = out.times(Math.min(1,(path.getTotalArcLength() - path.arcLength) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        temp = Robot;
-        out = new Vector2d(out.getY(), out.getX());
+        out = new Vector2d(out.getX(), out.getY());
         return out.times(Ks);
     }
 
     public Vector2d calculatePID(Vector2d robot) {
-        return new Vector2d(yPID.pidOut(path.getPoint(2.999).getY() - robot.getY()), xPID.pidOut((path.getPoint(2.999).getX()) - robot.getX()));
+        double yOut = yPID.pidOut(path.getControlPoint(11).getY() - robot.getY());
+        double xOut = xPID.pidOut(path.getControlPoint(11).getX() - robot.getX());
+        double max = Math.max(Math.abs(yOut), Math.abs(xOut));
+        if (max > 1) {
+            return new Vector2d(xOut / max, yOut / max);
+        }
+        return new Vector2d(-xOut, yOut);
     }
 
     public double headingOut(double heading, double targetHeading) {
@@ -91,6 +102,8 @@ public class GVF {
     }
 
     public Vector2d output(Vector2d robot) {
+        telemetry.addData("count",count);
+        telemetry.addData("robot",robot);
         if (isEnding()) telemetry.addData("isending",distanceFromEnd());
         drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY()));
         telemetry.addData("tep",temp);

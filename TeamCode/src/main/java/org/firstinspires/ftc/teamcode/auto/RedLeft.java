@@ -46,8 +46,7 @@ public class RedLeft extends LinearOpMode {
     }
 
     apexStates apexstate = apexStates.SPIKE;
-
-    GVF gvf;
+    Pose2d pose = new Pose2d(-45,-60,90 / (180 / Math.PI));
 
     VisionProcessor processor;
     VisionPortal portal;
@@ -68,7 +67,7 @@ public class RedLeft extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(-45,-58,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(-45,-60,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
 
 
@@ -78,7 +77,7 @@ public class RedLeft extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        gvf = new GVF(dashboard, PathList.RedLeftPathToSpike, 1.6, 4, 1, telemetry);
+        GVF gvf = new GVF(dashboard, PathList.RedLeftPathToSpike, 2, 4, 1, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -105,19 +104,18 @@ public class RedLeft extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
             Canvas canvas = packet.fieldOverlay();
-            Pose2d pose = drive.getPose();
             drawRobot(canvas, pose);
             dashboard.sendTelemetryPacket(packet);
+            telemetry.addData("pose",pose);
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            //drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),0));
-            drive.drive(0,0,0);
+            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),180));
 
+            pose = drive.getPose();
             double nano = System.nanoTime();
             hz += (1000000000 / (nano - nanoTime));
             count++;
             telemetry.addData("hz", hz / count);
             nanoTime = nano;
-            telemetry.addData("pose",pose);
             telemetry.addData("guess",PathList.RedLeftPathToSpike.getPoint(PathList.RedLeftPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());
