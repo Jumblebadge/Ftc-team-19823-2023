@@ -36,7 +36,7 @@ public class IMU {
     }
 
     public double getHeadingInRadians() {
-        return AngleUnit.normalizeRadians(angle.firstAngle + Math.toRadians(imuOffset));
+        return AngleUnit.normalizeRadians(AngleUnit.DEGREES.toRadians(angle.firstAngle) + Math.toRadians(imuOffset));
     }
 
     public void updateHeading(int interval) {

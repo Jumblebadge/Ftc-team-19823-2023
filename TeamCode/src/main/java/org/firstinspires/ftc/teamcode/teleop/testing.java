@@ -19,7 +19,20 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-    public Vector2d A1 = new Vector2d(-45,-60), A2 = new Vector2d(20,-60), A3 = new Vector2d(25,-60), A4 = new Vector2d(25,-45), B1 = A4, B2 = new Vector2d(25,-30), B3 = new Vector2d(25, -30), B4 = new Vector2d(25,-22), C1 = B4, C2 = new Vector2d(25,-14), C3 = new Vector2d(20,-12), C4 = new Vector2d(-45,-12);
+    public static final Vector2d[] points = {
+            new Vector2d(-45,-60),
+            new Vector2d(-45,-59),
+            new Vector2d(-45,-57),
+            new Vector2d(-45,-52),
+            new Vector2d(-45,-47),
+            new Vector2d(-45,-41),
+            new Vector2d(-45,-39),
+            new Vector2d(-45,-37),
+            new Vector2d(-45,-36),
+            new Vector2d(-45,-35.9),
+            new Vector2d(-45,-35.65),
+            new Vector2d(-45,-35.5)
+    };
     FtcDashboard dashboard;
     private double nanoTime = 0;
     Vector2d guess;
@@ -33,7 +46,7 @@ public class testing extends LinearOpMode {
         dashboard = FtcDashboard.getInstance();
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
-        CubicPath path = new CubicPath(A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4);
+        CubicPath path = new CubicPath(points);
         GVF gvf = new GVF(dashboard,path,1.6,20,1, telemetry);
 
         drive.setPoseEstimate(new Pose2d(-45,-60,0 ));

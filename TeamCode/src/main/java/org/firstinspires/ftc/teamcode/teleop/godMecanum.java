@@ -79,7 +79,6 @@ public class godMecanum extends LinearOpMode {
             for (LynxModule hub : allHubs) { hub.clearBulkCache(); }
 
             //driving gamepad
-
             if (headingPIDtoggle.toggle(gamepad1.a)) {
                 rotation = headingPID.pidOut(AngleUnit.normalizeDegrees(heading - drive.getHeadingInDegrees()));
             }
@@ -112,16 +111,6 @@ public class godMecanum extends LinearOpMode {
             }
 
             drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
-
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas fieldOverlay = packet.fieldOverlay();
-            Pose2d pose = drive.getPose();
-            drawRobot(fieldOverlay, drive.getPose());
-            packet.put("x", pose.getX());
-            packet.put("y", pose.getY());
-            packet.put("heading (deg)", Math.toDegrees(pose.getHeading()));
-
-            dashboard.sendTelemetryPacket(packet);
 
             if (gamepad2.a) {
                 deposit.in();

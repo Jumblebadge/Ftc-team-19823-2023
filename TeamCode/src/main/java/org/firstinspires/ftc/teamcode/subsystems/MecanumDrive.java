@@ -39,7 +39,7 @@ public class MecanumDrive implements Driveable{
 
         imu = new IMU(hardwareMap);
 
-        if (isAuto) odo = new StandardTrackingWheelLocalizer(hardwareMap);
+        if (isAuto) odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);//new StandardTrackingWheelLocalizer(hardwareMap);
         else odo = new TwoWheelTrackingLocalizer(hardwareMap, imu);
         this.isAuto = isAuto;
 
@@ -50,9 +50,11 @@ public class MecanumDrive implements Driveable{
 
         //Update heading of robot
         double heading;
+
+        if (isAuto) imu.updateHeading(0);
+        else imu.updateHeading(3);
         calculatePose();
-        if (!isAuto) heading = AngleUnit.normalizeDegrees( -pose.getHeading());
-        else heading = AngleUnit.normalizeDegrees(pose.getHeading());
+        heading = imu.getHeadingInRadians();
 
         double x1 = Math.cos(heading) * x - Math.sin(heading) * y;
         double y1 = Math.sin(heading) * x + Math.cos(heading) * y;

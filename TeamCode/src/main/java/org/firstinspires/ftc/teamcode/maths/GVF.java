@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.auto.PathList;
 
 public class GVF {
 
@@ -21,6 +22,7 @@ public class GVF {
     PIDcontroller xPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     PIDcontroller yPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
+    Vector2d temp;
     Telemetry telemetry;
 
 
@@ -31,7 +33,7 @@ public class GVF {
         this.Ks = Ks;
         this.dashboard = dashboard;
         this.telemetry = telemetry;
-        calculateGVF(new Vector2d(0,0));
+        calculateGVF(PathList.RedLeftPathToSpikePoints[0]);
     }
 
     public void setPath(CubicPath path) {
@@ -74,6 +76,7 @@ public class GVF {
         }
         out = out.times(Math.min(1,(path.getTotalArcLength() - path.arcLength) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
+        temp = Robot;
         out = new Vector2d(out.getY(), out.getX());
         return out.times(Ks);
     }
@@ -88,8 +91,9 @@ public class GVF {
     }
 
     public Vector2d output(Vector2d robot) {
-        if (isEnding()) telemetry.addData("isending",path.arcLength);
+        if (isEnding()) telemetry.addData("isending",distanceFromEnd());
         drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY()));
+        telemetry.addData("tep",temp);
         if (isEnding()) return calculatePID(robot);
         else return calculateGVF(robot);
     }
@@ -107,18 +111,14 @@ public class GVF {
             y[i] = points[i].getY();
         }
         canvas.strokePolyline(x,y);
-        drawRobot(canvas, robot, out, path);
-        drawRobot(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY()), out, path);
+        //drawRobot(canvas, robot, out, path);
+        drawPoint(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY()));
+        drawVectors(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY()), out, path);
         dash.sendTelemetryPacket(packet);
     }
 
-    public static void drawRobot(Canvas canvas, Pose2d pose, Vector2d out, CubicPath path) {
-        drawVectors(canvas, pose, out, path);
-        canvas.strokeCircle(pose.getX(), pose.getY(), 9);
-        Vector2d v = pose.headingVec().times(9);
-        double x1 = pose.getX() + v.getX() / 2, y1 = pose.getY() + v.getY() / 2;
-        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
-        canvas.strokeLine(x1, y1, x2, y2);
+    public static void drawPoint(Canvas canvas, Pose2d pose) {
+        canvas.fillCircle(pose.getX(), pose.getY(), 4);
     }
 
     public static void drawVectors(Canvas canvas, Pose2d pose, Vector2d out, CubicPath path) {

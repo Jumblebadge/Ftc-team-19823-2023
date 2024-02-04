@@ -9,7 +9,7 @@ public class PathList {
 
     public static Vector2d Temp = new Vector2d(0,0);
 
-    public static final CubicPath RedLeftPathToSpike = new CubicPath(
+    public static final Vector2d[] RedLeftPathToSpikePoints = {
             new Vector2d(-45,-60),
             new Vector2d(-45,-59),
             new Vector2d(-45,-57),
@@ -21,5 +21,7 @@ public class PathList {
             new Vector2d(-45,-36),
             new Vector2d(-45,-35.9),
             new Vector2d(-45,-35.65),
-            new Vector2d(-45,-15.5));
+            new Vector2d(-45,-35.5)
+    };
+    public static final CubicPath RedLeftPathToSpike = new CubicPath(RedLeftPathToSpikePoints);
 }
