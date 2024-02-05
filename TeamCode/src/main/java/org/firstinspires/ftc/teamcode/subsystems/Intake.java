@@ -15,7 +15,7 @@ public class Intake {
     //TODO make this extensive
 
     private final DcMotorExW intake;
-    private final double intakePower = 1;
+    private final double intakePower = 0.5;
     HorizontalSlide slide;
     ServoImplExW latch, canopee;
     public final double LATCH_OPEN = 0.3, LATCH_CLOSED = 0.45;

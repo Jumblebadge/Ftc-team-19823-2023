@@ -69,7 +69,7 @@ public class CubicPath {
         else if (arcLengths[0] + arcLengths[1] <= distance && distance <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
             return 2;
         }
-        return -1;
+        return -(int)distance;
     }
 
     public double distanceToT(double distance) {

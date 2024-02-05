@@ -10,12 +10,9 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
-import org.firstinspires.ftc.teamcode.maths.GoToPoint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -31,18 +28,18 @@ import java.util.List;
 
 @Config
 @Autonomous(name="Red Left", group="Linear Opmode")
-public class RedLeft extends LinearOpMode {
+public class RedRight extends LinearOpMode {
 
     //Initialize FTCDashboard
     FtcDashboard dashboard;
 
-    double taskNumber = 0;
+    double taskNumber = 0, targetHeading = 180;
     private double nanoTime = 0, hz = 0, count = 0;
 
     enum apexStates {
         SPIKE,
-        DEPOSIT,
-        PARK
+        CYCLE,
+        IDLE
     }
 
     apexStates apexstate = apexStates.SPIKE;
@@ -67,8 +64,9 @@ public class RedLeft extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(-45,-60,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(3.5,-60,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
 
 
         //Initialize FTCDashboard
@@ -77,7 +75,7 @@ public class RedLeft extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, PathList.RedLeftPathToSpike, 2, 4, 1, telemetry);
+        GVF gvf = new GVF(dashboard, PathList.RedRightPathToSpike, 2, 9, 1, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -102,15 +100,43 @@ public class RedLeft extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
+            Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading));
+
+            switch(apexstate){
+                case SPIKE:
+                    if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
+                    else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
+                    else targetHeading = 180;
+                    if (gvf.isDone() && taskNumber == 0) {
+                        intake.eject();
+                        taskNumber++;
+                        goofytimer.reset();
+                    }
+                    if (taskNumber == 1 && goofytimer.seconds() > 3) {
+                        intake.off();
+                        gvf.setPath(PathList.RedRightSpikeToStack, 2.25, 9, 0.5);
+                        taskNumber = 0;
+                        targetHeading = 90;
+                        apexstate = apexStates.CYCLE;
+                    }
+                    break;
+
+                case CYCLE:
+                    if (gvf.isDone() && taskNumber == 0) {
+                        intake.on();
+                        taskNumber++;
+                        goofytimer.reset();
+                    }
+                    break;
+            }
+
+            pose = drive.getPose();
             TelemetryPacket packet = new TelemetryPacket();
             Canvas canvas = packet.fieldOverlay();
             drawRobot(canvas, pose);
             dashboard.sendTelemetryPacket(packet);
             telemetry.addData("pose",pose);
-            Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),180));
-
-            pose = drive.getPose();
             double nano = System.nanoTime();
             hz += (1000000000 / (nano - nanoTime));
             count++;

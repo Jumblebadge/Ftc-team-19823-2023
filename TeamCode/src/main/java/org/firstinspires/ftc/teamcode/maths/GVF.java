@@ -22,6 +22,7 @@ public class GVF {
     PIDcontroller xPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     PIDcontroller yPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
+    private double distance, headingDistance;
     Vector2d temp = new Vector2d(0,0);
     int count = 0;
     Telemetry telemetry;
@@ -37,14 +38,12 @@ public class GVF {
         calculateGVF(this.path.getControlPoint(0));
     }
 
-    public void setPath(CubicPath path) {
+    public void setPath(CubicPath path, double Kn, double Kf, double Ks) {
         this.path = path;
-    }
-
-    public void tune(double Kn, double Kf, double Ks) {
         this.Kn = Kn;
         this.Kf = Kf;
         this.Ks = Ks;
+        calculateGVF(this.path.getControlPoint(0));
     }
 
     public double calculateError(Vector2d tangent) {
@@ -61,11 +60,13 @@ public class GVF {
         R = new Vector2d(Robot.getX() - closestPoint.getX(), Robot.getY() - closestPoint.getY());
     }
 
-    public double tangentHeading() { return AngleUnit.normalizeDegrees(360 - (tangent.angle() * (180 / Math.PI))); }
+    public double tangentHeading() { return AngleUnit.normalizeDegrees(90 + (360 - (tangent.angle() * (180 / Math.PI)))); }
 
     public double distanceFromEnd() { return path.getTotalArcLength() - path.arcLength; }
 
     public boolean isEnding() { return distanceFromEnd() < Kf; }
+
+    public boolean isDone() { return distance < 10 && headingDistance < 10; }
 
     public Vector2d calculateGVF(Vector2d Robot) {
         count++;
@@ -82,7 +83,7 @@ public class GVF {
         }
         out = out.times(Math.min(1,(path.getTotalArcLength() - path.arcLength) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        out = new Vector2d(out.getX(), out.getY());
+        out = new Vector2d(-out.getX(), out.getY());
         return out.times(Ks);
     }
 
@@ -97,11 +98,18 @@ public class GVF {
     }
 
     public double headingOut(double heading, double targetHeading) {
-        if (isEnding()) return headingPID.pidOut(AngleUnit.normalizeDegrees(targetHeading - heading));
-        else return headingPID.pidOut(AngleUnit.normalizeDegrees(tangentHeading() - heading));
+        if (isEnding()) {
+            headingDistance = Math.abs(AngleUnit.normalizeDegrees(targetHeading - heading));
+            return headingPID.pidOut(AngleUnit.normalizeDegrees(targetHeading - heading));
+        }
+        else {
+            headingDistance = Math.abs(AngleUnit.normalizeDegrees(tangentHeading() - heading));
+            return headingPID.pidOut(AngleUnit.normalizeDegrees(tangentHeading() - heading));
+        }
     }
 
     public Vector2d output(Vector2d robot) {
+        distance = path.getControlPoint(11).distTo(robot);
         telemetry.addData("count",count);
         telemetry.addData("robot",robot);
         if (isEnding()) telemetry.addData("isending",distanceFromEnd());
