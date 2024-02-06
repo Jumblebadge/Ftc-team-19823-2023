@@ -88,8 +88,8 @@ public class GVF {
     }
 
     public Vector2d calculatePID(Vector2d robot) {
-        double yOut = yPID.pidOut(path.getControlPoint(11).getY() - robot.getY());
-        double xOut = xPID.pidOut(path.getControlPoint(11).getX() - robot.getX());
+        double yOut = yPID.pidOut(path.getControlPoint(7).getY() - robot.getY());
+        double xOut = xPID.pidOut(path.getControlPoint(7).getX() - robot.getX());
         double max = Math.max(Math.abs(yOut), Math.abs(xOut));
         if (max > 1) {
             return new Vector2d(xOut / max, yOut / max);
@@ -109,7 +109,7 @@ public class GVF {
     }
 
     public Vector2d output(Vector2d robot) {
-        distance = path.getControlPoint(11).distTo(robot);
+        distance = path.getControlPoint(7).distTo(robot);
         telemetry.addData("count",count);
         telemetry.addData("robot",robot);
         if (isEnding()) telemetry.addData("isending",distanceFromEnd());

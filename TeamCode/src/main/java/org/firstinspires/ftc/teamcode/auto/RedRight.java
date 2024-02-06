@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -35,6 +36,7 @@ public class RedRight extends LinearOpMode {
 
     double taskNumber = 0, targetHeading = 180;
     private double nanoTime = 0, hz = 0, count = 0;
+    private boolean depositScoring = false;
 
     enum apexStates {
         SPIKE,
@@ -49,7 +51,7 @@ public class RedRight extends LinearOpMode {
     VisionPortal portal;
 
     ElapsedTime goofytimer = new ElapsedTime();
-    ElapsedTime hztimer = new ElapsedTime();
+    ElapsedTime swingTimer = new ElapsedTime();
 
 
 
@@ -64,7 +66,7 @@ public class RedRight extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(3.5,-60,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(12,-60,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
@@ -94,6 +96,7 @@ public class RedRight extends LinearOpMode {
         goofytimer.reset();
         drive.resetIMU();
         portal.close();
+        intake.setCanopeePosition(intake.CANOPEE_DOWN);
 
 
         while (opModeIsActive()) {
@@ -115,7 +118,7 @@ public class RedRight extends LinearOpMode {
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 3) {
                         intake.off();
-                        gvf.setPath(PathList.RedRightSpikeToStack, 2.25, 9, 0.5);
+                        gvf.setPath(PathList.RedRightSpikeToStack, 2.25, 20, 0.75);
                         taskNumber = 0;
                         targetHeading = 90;
                         apexstate = apexStates.CYCLE;
@@ -128,7 +131,38 @@ public class RedRight extends LinearOpMode {
                         taskNumber++;
                         goofytimer.reset();
                     }
+                    if (taskNumber == 1 && goofytimer.seconds() > 3) {
+                        intake.off();
+                        taskNumber++;
+                        gvf.setPath(PathList.RedStackToBoard, 2.25, 20, 0.75);
+                    }
+                    if (taskNumber == 2 && gvf.isDone()) {
+                        //depositScoring = true;
+                        taskNumber++;
+                        goofytimer.reset();
+                    }
+                    if (taskNumber == 3 && goofytimer.seconds() > 3) {
+                        deposit.toggleLatch(false);
+                    }
+                    if (taskNumber == 3 && goofytimer.seconds() > 6) {
+                        depositScoring = false;
+                    }
                     break;
+            }
+
+            if (depositScoring) {
+                deposit.setSwingPosition(deposit.SWING_OUT);
+                deposit.setEndPosition(deposit.END_OUT);
+                swingTimer.reset();
+            }
+            else {
+                deposit.setEndPosition(deposit.END_IN);
+                if (swingTimer.seconds() > 0.2) {
+                    if (/*intake.currentState() == HorizontalSlide.in && */deposit.currentState() == VerticalSlide.in /*&& intake.isSlideDone()*/ && deposit.isSlideDone()) {
+                        deposit.setSwingPosition(deposit.SWING_TRANSFER);
+                    }
+                    else deposit.setSwingPosition(deposit.SWING_WAIT);
+                }
             }
 
             pose = drive.getPose();
@@ -142,7 +176,7 @@ public class RedRight extends LinearOpMode {
             count++;
             telemetry.addData("hz", hz / count);
             nanoTime = nano;
-            telemetry.addData("guess",PathList.RedLeftPathToSpike.getPoint(PathList.RedLeftPathToSpike.guessT));
+            telemetry.addData("guess",PathList.RedRightPathToSpike.getPoint(PathList.RedRightPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());
             telemetry.update();

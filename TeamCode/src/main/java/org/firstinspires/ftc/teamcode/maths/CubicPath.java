@@ -16,16 +16,16 @@ public class CubicPath {
     public CubicPath(Vector2d[] controlPoints) {
         this.controlPoints = controlPoints;
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
-        beziers[1].setControlPoints(controlPoints[4], controlPoints[5], controlPoints[6], controlPoints[7]);
-        beziers[2].setControlPoints(controlPoints[8], controlPoints[9], controlPoints[10], controlPoints[11]);
+        beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
+        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[5], controlPoints[6]);
         calculateTotalArcLength();
     }
 
     public void setControlPoints(Vector2d[] controlPoints) {
         this.controlPoints = controlPoints;
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
-        beziers[1].setControlPoints(controlPoints[4], controlPoints[5], controlPoints[6], controlPoints[7]);
-        beziers[2].setControlPoints(controlPoints[8], controlPoints[9], controlPoints[10], controlPoints[11]);
+        beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
+        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[5], controlPoints[6]);
         calculateTotalArcLength();
     }
 
