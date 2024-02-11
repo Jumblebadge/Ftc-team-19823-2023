@@ -32,6 +32,8 @@ public class godMecanum extends LinearOpMode {
 
     FtcDashboard dashboard;
 
+    public static double slideTarget = 0;
+
     private double rotation, heading, nanoTime = 0, intakePower = 0, hz = 0, count = 0;
 
     public void runOpMode() {
@@ -113,14 +115,14 @@ public class godMecanum extends LinearOpMode {
             drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
 
             if (gamepad2.a) {
-                deposit.in();
+                //deposit.in();
                 intake.in();
             }
             if (gamepad2.b) {
-                deposit.mid1();
+                //deposit.mid1();
             }
             if (gamepad2.x) {
-                deposit.mid2();
+                //deposit.mid2();
                 intake.mid1();
             }
             if (gamepad2.y) {
@@ -128,16 +130,16 @@ public class godMecanum extends LinearOpMode {
             }
 
             if (gamepad2.dpad_down) {
-                intake.in();
+                //intake.in();
             }
             if (gamepad2.dpad_right) {
-                intake.mid1();
+                //intake.mid1();
             }
             if (gamepad2.dpad_left) {
-                intake.mid2();
+                //intake.mid2();
             }
             if (gamepad2.dpad_up) {
-                intake.out();
+                //intake.out();
             }
             intakePower = gamepad2.left_trigger/1.5;
             if (intakeReverse.toggle(gamepad2.left_bumper)) {

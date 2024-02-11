@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 
+import java.nio.file.Path;
 import java.util.List;
 
 
@@ -36,12 +37,14 @@ public class RedRight extends LinearOpMode {
 
     double taskNumber = 0, targetHeading = 180;
     private double nanoTime = 0, hz = 0, count = 0;
-    private boolean depositScoring = false;
+    private boolean depositScoring = false, followTangent = true;
+
+    double temp = 0;
 
     enum apexStates {
         SPIKE,
         CYCLE,
-        IDLE
+        PARK
     }
 
     apexStates apexstate = apexStates.SPIKE;
@@ -66,7 +69,7 @@ public class RedRight extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(12,-60,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(12,-62.75,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
@@ -77,7 +80,7 @@ public class RedRight extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, PathList.RedRightPathToSpike, 2, 9, 1, telemetry);
+        GVF gvf = new GVF(dashboard, PathList.RedRightPathToSpike, 2, 15, 0.7, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -95,8 +98,10 @@ public class RedRight extends LinearOpMode {
         apexstate = apexStates.SPIKE;
         goofytimer.reset();
         drive.resetIMU();
+        intake.setIntakePower(0);
         portal.close();
-        intake.setCanopeePosition(intake.CANOPEE_DOWN);
+        intake.setCanopeePosition(intake.CANOPEE_UP);
+        deposit.toggleLatch(true);
 
 
         while (opModeIsActive()) {
@@ -104,21 +109,21 @@ public class RedRight extends LinearOpMode {
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading));
+            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent));
 
             switch(apexstate){
                 case SPIKE:
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
-                    if (gvf.isDone() && taskNumber == 0) {
-                        intake.eject();
+                    if (gvf.isDone(5, 5) && taskNumber == 0) {
+                        intake.setIntakePower(-0.5);
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 3) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 1) {
                         intake.off();
-                        gvf.setPath(PathList.RedRightSpikeToStack, 2.25, 20, 0.75);
+                        gvf.setPath(PathList.RedRightSpikeToStack, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
                         apexstate = apexStates.CYCLE;
@@ -126,40 +131,71 @@ public class RedRight extends LinearOpMode {
                     break;
 
                 case CYCLE:
-                    if (gvf.isDone() && taskNumber == 0) {
+                    if (gvf.isDone(5, 10) && taskNumber == 0) {
+                        followTangent = false;
+                        gvf.setPath(PathList.RedStackAdjustment, 3.25, 10, 0.333);
+                        intake.eject();
+                        intake.toggleLatch(false);
+                        taskNumber++;
+                        goofytimer.reset();
+                    }
+                    if (taskNumber == 1 && goofytimer.seconds() > 2) {
+                        intake.setCanopeePosition(intake.CANOPEE_DOWN);
                         intake.on();
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 3) {
-                        intake.off();
-                        taskNumber++;
-                        gvf.setPath(PathList.RedStackToBoard, 2.25, 20, 0.75);
-                    }
-                    if (taskNumber == 2 && gvf.isDone()) {
-                        //depositScoring = true;
+                    if (taskNumber == 2 && goofytimer.seconds() > 1) {
+                        intake.toggleLatch(true);
+                        followTangent = true;
+                        gvf.setPath(PathList.RedStackToBoard, 3.25, 20, 0.5);
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 3 && goofytimer.seconds() > 3) {
+                    if (taskNumber == 3 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
+                        depositScoring = true;
+                        taskNumber++;
+                        goofytimer.reset();
+                        intake.off();
+                        gvf.setPath(PathList.RedBoardAdjustment, 3.25, 15, 0.75);
+                    }
+                    if (taskNumber == 4 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
+                        taskNumber++;
+                        goofytimer.reset();
+                    }
+                    if (taskNumber == 5 && goofytimer.seconds() > 1) {
                         deposit.toggleLatch(false);
                     }
-                    if (taskNumber == 3 && goofytimer.seconds() > 6) {
+                    if (taskNumber == 5 && goofytimer.seconds() > 2) {
                         depositScoring = false;
+                        taskNumber = 0;
+                        targetHeading = 0;
+                        gvf.setPath(PathList.RedPark, 3.25, 5, 0.5);
+                        goofytimer.reset();
+                        apexstate = apexStates.PARK;
                     }
+
+
+                    break;
+
+                case PARK:
+
                     break;
             }
 
             if (depositScoring) {
+                temp = 0;
                 deposit.setSwingPosition(deposit.SWING_OUT);
                 deposit.setEndPosition(deposit.END_OUT);
                 swingTimer.reset();
             }
             else {
                 deposit.setEndPosition(deposit.END_IN);
+                temp = 1;
                 if (swingTimer.seconds() > 0.2) {
                     if (/*intake.currentState() == HorizontalSlide.in && */deposit.currentState() == VerticalSlide.in /*&& intake.isSlideDone()*/ && deposit.isSlideDone()) {
                         deposit.setSwingPosition(deposit.SWING_TRANSFER);
+                        temp = 2;
                     }
                     else deposit.setSwingPosition(deposit.SWING_WAIT);
                 }
@@ -176,6 +212,8 @@ public class RedRight extends LinearOpMode {
             count++;
             telemetry.addData("hz", hz / count);
             nanoTime = nano;
+            telemetry.addData("temp",temp);
+            telemetry.addData("isdone",gvf.isDone(10, 10));
             telemetry.addData("guess",PathList.RedRightPathToSpike.getPoint(PathList.RedRightPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());

@@ -64,9 +64,9 @@ public class GVF {
 
     public double distanceFromEnd() { return path.getTotalArcLength() - path.arcLength; }
 
-    public boolean isEnding() { return distanceFromEnd() < Kf; }
+    public boolean isEnding() { return distanceFromEnd() * 1.3 < Kf; }
 
-    public boolean isDone() { return distance < 10 && headingDistance < 10; }
+    public boolean isDone(double positionTolerance, double headingTolerance) { return distance < positionTolerance && headingDistance < headingTolerance; }
 
     public Vector2d calculateGVF(Vector2d Robot) {
         count++;
@@ -81,7 +81,7 @@ public class GVF {
         if (max > 1) {
             out = new Vector2d(out.getX() / max, out.getY() / max);
         }
-        out = out.times(Math.min(1,(path.getTotalArcLength() - path.arcLength) / Kf));
+        out = out.times(Math.min(1,(distanceFromEnd()) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
         out = new Vector2d(-out.getX(), out.getY());
         return out.times(Ks);
@@ -97,15 +97,13 @@ public class GVF {
         return new Vector2d(-xOut, yOut);
     }
 
-    public double headingOut(double heading, double targetHeading) {
-        if (isEnding()) {
-            headingDistance = Math.abs(AngleUnit.normalizeDegrees(targetHeading - heading));
-            return headingPID.pidOut(AngleUnit.normalizeDegrees(targetHeading - heading));
+    public double headingOut(double heading, double targetHeading, boolean followTangent) {
+        double target = targetHeading;
+        if (!isEnding() && followTangent) {
+            target = tangentHeading();
         }
-        else {
-            headingDistance = Math.abs(AngleUnit.normalizeDegrees(tangentHeading() - heading));
-            return headingPID.pidOut(AngleUnit.normalizeDegrees(tangentHeading() - heading));
-        }
+        headingDistance = Math.abs(AngleUnit.normalizeDegrees(target - heading));
+        return headingPID.pidOut(AngleUnit.normalizeDegrees(target - heading));
     }
 
     public Vector2d output(Vector2d robot) {

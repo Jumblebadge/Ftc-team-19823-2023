@@ -17,7 +17,7 @@ public class CubicPath {
         this.controlPoints = controlPoints;
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
-        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[5], controlPoints[6]);
+        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
         calculateTotalArcLength();
     }
 
@@ -25,7 +25,7 @@ public class CubicPath {
         this.controlPoints = controlPoints;
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
-        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[5], controlPoints[6]);
+        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
         calculateTotalArcLength();
     }
 
@@ -69,7 +69,8 @@ public class CubicPath {
         else if (arcLengths[0] + arcLengths[1] <= distance && distance <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
             return 2;
         }
-        return -(int)distance;
+        //return -(int) distance
+        return 2;
     }
 
     public double distanceToT(double distance) {
