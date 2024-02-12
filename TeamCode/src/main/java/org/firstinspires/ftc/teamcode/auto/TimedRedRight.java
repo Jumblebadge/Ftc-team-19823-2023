@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
 
 @Config
+@Disabled
 @Autonomous(name="RedRight", group="Linear Opmode")
 public class TimedRedRight extends LinearOpMode {
 

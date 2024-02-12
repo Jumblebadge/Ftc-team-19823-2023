@@ -24,7 +24,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 
 @Config
 @Disabled
-@Autonomous(name="Red Right", group="Linear Opmode")
+@Autonomous(name="Red Right PID", group="Linear Opmode")
 public class PIDRedRight extends LinearOpMode {
 
     //Initialize FTCDashboard

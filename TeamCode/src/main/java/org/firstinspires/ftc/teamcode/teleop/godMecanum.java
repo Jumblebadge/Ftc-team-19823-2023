@@ -130,16 +130,16 @@ public class godMecanum extends LinearOpMode {
             }
 
             if (gamepad2.dpad_down) {
-                //intake.in();
+                intake.in();
             }
             if (gamepad2.dpad_right) {
-                //intake.mid1();
+                intake.mid1();
             }
             if (gamepad2.dpad_left) {
-                //intake.mid2();
+                intake.mid2();
             }
             if (gamepad2.dpad_up) {
-                //intake.out();
+                intake.out();
             }
             intakePower = gamepad2.left_trigger/1.5;
             if (intakeReverse.toggle(gamepad2.left_bumper)) {

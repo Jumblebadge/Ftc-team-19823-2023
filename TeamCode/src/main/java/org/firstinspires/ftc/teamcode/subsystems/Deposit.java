@@ -22,7 +22,7 @@ public class Deposit {
     private final VerticalSlide slide;
     public final double LATCH_CLOSED = 1, LATCH_OPEN = 0;
     public final double END_IN = 1, END_OUT = 0.175;
-    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.19, SWING_WAIT = 0.24;
+    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.195, SWING_WAIT = 0.25;
     // x, x-0.51, x-0.46
 
     public Deposit(HardwareMap hardwareMap) {

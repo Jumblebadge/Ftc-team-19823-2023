@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 
 @Config
+@Disabled
 @Autonomous(name="BlueLeft", group="Linear Opmode")
 public class TimedBlueLeft extends LinearOpMode {
 
