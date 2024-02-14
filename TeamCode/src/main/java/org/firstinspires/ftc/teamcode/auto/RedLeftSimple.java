@@ -47,7 +47,7 @@ public class RedLeftSimple extends LinearOpMode {
     }
 
     apexStates apexstate = apexStates.SPIKE;
-    Pose2d pose = new Pose2d(-36,-62.75,90 / (180 / Math.PI));
+    Pose2d pose = new Pose2d(-36,-62.5,90 / (180 / Math.PI));
 
     VisionProcessor processor;
     VisionPortal portal;
@@ -68,14 +68,14 @@ public class RedLeftSimple extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(pose);
+        drive.setPoseEstimate(new Pose2d(-36,-62.75,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
 
         //Initialize FTCDashboard
         dashboard = FtcDashboard.getInstance();
-        //telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
 
         //Create objects for the classes we use
@@ -90,6 +90,10 @@ public class RedLeftSimple extends LinearOpMode {
             telemetry.addData("seen", HSVDetectElement.returnDetected());
             telemetry.update();
             sleep(20);
+            if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
+                gvf.setPath(PathList.RedLeftAlternatePathToSpike, 4, 15, 0.5);
+            }
+            else gvf.setPath(PathList.RedLeftPathToSpike, 4, 15, 0.5);
         }
 
         waitForStart();
@@ -99,6 +103,7 @@ public class RedLeftSimple extends LinearOpMode {
         drive.resetIMU();
         intake.setIntakePower(0);
         portal.close();
+        taskNumber = 0;
         intake.setCanopeePosition(intake.CANOPEE_UP);
         deposit.toggleLatch(true);
 
@@ -115,7 +120,7 @@ public class RedLeftSimple extends LinearOpMode {
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
-                    if (gvf.isDone(5, 5) && taskNumber == 0) {
+                    if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
                         intake.setIntakePower(-0.5);
                         taskNumber++;
                         goofytimer.reset();
@@ -157,8 +162,8 @@ public class RedLeftSimple extends LinearOpMode {
 
             if (depositScoring) {
                 temp = 0;
-                deposit.setSwingPosition(deposit.SWING_OUT);
-                deposit.setEndPosition(deposit.END_OUT);
+                deposit.setSwingPosition(deposit.SECONDARY_SWING_OUT);
+                deposit.setEndPosition(deposit.SECONDARY_END_OUT);
                 swingTimer.reset();
             }
             else {
@@ -180,10 +185,9 @@ public class RedLeftSimple extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
             telemetry.addData("pose",pose);
             double nano = System.nanoTime();
-            hz = (1000000000 / (nano - nanoTime));
+            hz += (1000000000 / (nano - nanoTime));
             count++;
-            telemetry.addData("hz", hz/* / count*/);
-
+            telemetry.addData("hz", hz / count);
             nanoTime = nano;
             telemetry.addData("temp",temp);
             telemetry.addData("isdone",gvf.isDone(10, 10));

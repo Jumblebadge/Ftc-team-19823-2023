@@ -19,7 +19,7 @@ public class GVF {
     Vector2d R, closestPoint, out, tangent;
     FtcDashboard dashboard;
     PIDcontroller headingPID = new PIDcontroller(0.1,0.001,0,0.75,0.1);
-    PIDcontroller xPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
+    PIDcontroller xPID = new PIDcontroller(0.6,0,0,0.275, 0.1);
     PIDcontroller yPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
     private double distance, headingDistance;

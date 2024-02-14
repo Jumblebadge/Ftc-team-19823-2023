@@ -79,7 +79,7 @@ public class RedRightSimple extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, PathList.RedRightPathToSpike, 2, 15, 0.7, telemetry);
+        GVF gvf = new GVF(dashboard, PathList.RedRightPathToSpike, 4, 15, 0.5, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -90,6 +90,10 @@ public class RedRightSimple extends LinearOpMode {
             telemetry.addData("seen", HSVDetectElement.returnDetected());
             telemetry.update();
             sleep(20);
+            if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
+                gvf.setPath(PathList.RedRightAlternatePathToSpike, 4, 15, 0.5);
+            }
+            else gvf.setPath(PathList.RedRightPathToSpike, 4, 15, 0.5);
         }
 
         waitForStart();
@@ -99,6 +103,7 @@ public class RedRightSimple extends LinearOpMode {
         drive.resetIMU();
         intake.setIntakePower(0);
         portal.close();
+        taskNumber = 0;
         intake.setCanopeePosition(intake.CANOPEE_UP);
         deposit.toggleLatch(true);
 
@@ -115,7 +120,7 @@ public class RedRightSimple extends LinearOpMode {
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
-                    if (gvf.isDone(5, 5) && taskNumber == 0) {
+                    if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
                         intake.setIntakePower(-0.5);
                         taskNumber++;
                         goofytimer.reset();
@@ -157,8 +162,8 @@ public class RedRightSimple extends LinearOpMode {
 
             if (depositScoring) {
                 temp = 0;
-                deposit.setSwingPosition(deposit.SWING_OUT);
-                deposit.setEndPosition(deposit.END_OUT);
+                deposit.setSwingPosition(deposit.SECONDARY_SWING_OUT);
+                deposit.setEndPosition(deposit.SECONDARY_END_OUT);
                 swingTimer.reset();
             }
             else {

@@ -29,6 +29,18 @@ public class PathList {
     };
     public static final CubicPath RedRightPathToSpike = new CubicPath(RedRightPathToSpikePoints);
 
+    public static final Vector2d[] RedRightAlternatePathToSpikePoints = {
+            new Vector2d(12,-60),
+            new Vector2d(9,-57),
+            new Vector2d(9,-52),
+            new Vector2d(9,-47),
+            new Vector2d(9,-39),
+            new Vector2d(9,-37),
+            new Vector2d(9,-37),
+            new Vector2d(9,-32.5)
+    };
+    public static final CubicPath RedRightAlternatePathToSpike = new CubicPath(RedRightAlternatePathToSpikePoints);
+
     public static final Vector2d[] RedRightSpikeToBoardPoints = {
             RedRightPathToSpikePoints[7].plus(new Vector2d(0,10)),
             new Vector2d(12.6,-60.2),
@@ -37,7 +49,7 @@ public class PathList {
             new Vector2d(36.0,-40.2),
             new Vector2d(39.6,-39.5),
             new Vector2d(45.7,-37.7),
-            new Vector2d(50.0,-36),
+            new Vector2d(50,-36),
     };
     public static final CubicPath RedRightSpikeToBoard = new CubicPath(RedRightSpikeToBoardPoints);
 
@@ -49,7 +61,7 @@ public class PathList {
             new Vector2d(36.0,-40.2),
             new Vector2d(39.6,-39.5),
             new Vector2d(45.7,-37.7),
-            new Vector2d(50.0,-41.5),
+            new Vector2d(50,-41.5),
     };
     public static final CubicPath RedRightSpikeToBoardRight = new CubicPath(RedRightSpikeToBoardRightPoints);
 
@@ -61,7 +73,7 @@ public class PathList {
             new Vector2d(36.0,-40.2),
             new Vector2d(39.6,-39.5),
             new Vector2d(45.7,-37.7),
-            new Vector2d(50.0,-28.5),
+            new Vector2d(50,-28.5),
     };
     public static final CubicPath RedRightSpikeToBoardLeft = new CubicPath(RedRightSpikeToBoardLeftPoints);
 
@@ -89,9 +101,21 @@ public class PathList {
             new Vector2d(-36,-39),
             new Vector2d(-36,-37),
             new Vector2d(-36,-37),
-            new Vector2d(-36,-34)
+            new Vector2d(-36,-32.5)
     };
     public static final CubicPath RedLeftPathToSpike = new CubicPath(RedLeftPathToSpikePoints);
+
+    public static final Vector2d[] RedLeftAlternatePathToSpikePoints = {
+            new Vector2d(-36,-60),
+            new Vector2d(-39,-57),
+            new Vector2d(-39,-52),
+            new Vector2d(-39,-47),
+            new Vector2d(-39,-39),
+            new Vector2d(-39,-37),
+            new Vector2d(-39,-37),
+            new Vector2d(-39,-32.5)
+    };
+    public static final CubicPath RedLeftAlternatePathToSpike = new CubicPath(RedLeftAlternatePathToSpikePoints);
 
     public static final Vector2d[] RedLeftSpikeToBoardPoints = {
             RedLeftPathToSpikePoints[7].plus(new Vector2d(0,10)),
@@ -101,7 +125,7 @@ public class PathList {
             new Vector2d(-1.0,-15.7),
             new Vector2d(8.7,-15.7),
             new Vector2d(22.0,-15.2),
-            new Vector2d(35.0,-12.0),
+            new Vector2d(35.0,-16),
     };
     public static final CubicPath RedLeftSpikeToBoard = new CubicPath(RedLeftSpikeToBoardPoints);
 
@@ -151,7 +175,7 @@ public class PathList {
             new Vector2d(37.4,-27.5),
             new Vector2d(40.4,-30.8),
             new Vector2d(45.7,-33.8),
-            new Vector2d(50,-45.5)
+            new Vector2d(50,-47)
     };
     public static final CubicPath RedBoardAdjustmentRight = new CubicPath(RedBoardAdjustmentRightPoints);
 

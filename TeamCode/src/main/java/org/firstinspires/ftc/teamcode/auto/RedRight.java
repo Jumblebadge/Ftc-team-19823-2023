@@ -185,8 +185,8 @@ public class RedRight extends LinearOpMode {
 
             if (depositScoring) {
                 temp = 0;
-                deposit.setSwingPosition(deposit.SWING_OUT);
-                deposit.setEndPosition(deposit.END_OUT);
+                deposit.setSwingPosition(deposit.SECONDARY_SWING_OUT);
+                deposit.setEndPosition(deposit.SECONDARY_END_OUT);
                 swingTimer.reset();
             }
             else {
