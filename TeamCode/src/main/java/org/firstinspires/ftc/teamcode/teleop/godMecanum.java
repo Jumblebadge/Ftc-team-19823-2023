@@ -60,6 +60,7 @@ public class godMecanum extends LinearOpMode {
         ButtonDetector depositMovement = new ButtonDetector();
         ButtonDetector depositLatch = new ButtonDetector();
         ButtonDetector canopeeToggle = new ButtonDetector();
+        ButtonDetector slideModeToggle = new ButtonDetector();
 
         ButtonDetector rumble = new ButtonDetector();
 
@@ -115,18 +116,15 @@ public class godMecanum extends LinearOpMode {
             drive.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation + Math.pow(gamepad1.right_stick_x,3));
 
             if (gamepad2.a) {
-                //deposit.in();
+                deposit.in();
                 intake.in();
             }
             if (gamepad2.b) {
-                //deposit.mid1();
+                deposit.mid1();
             }
             if (gamepad2.x) {
-                //deposit.mid2();
+                deposit.mid2();
                 intake.mid1();
-            }
-            if (gamepad2.y) {
-                //deposit.out();
             }
 
             if (gamepad2.dpad_down) {
@@ -172,17 +170,18 @@ public class godMecanum extends LinearOpMode {
                 if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
             }
 
-
             intake.update();
-            deposit.update();
+
+            if (slideModeToggle.toggle(gamepad2.right_stick_button)) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
+            else deposit.update();
 
             double nano = System.nanoTime();
-            hz += (1000000000 / (nano - nanoTime));
+            hz = (1000000000 / (nano - nanoTime));
             count++;
-            telemetry.addData("hz", hz / count);
+            telemetry.addData("hz", hz);
             nanoTime = nano;
 
-            telemetry.addData("slide", intake.getPosition());
+            telemetry.addData("slide", deposit.getPosition());
             telemetry.addData("test",test.seconds());
             telemetry.addData("pise",drive.getPose().toString());
             telemetry.update();

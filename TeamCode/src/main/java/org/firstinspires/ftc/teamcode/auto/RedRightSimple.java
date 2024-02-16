@@ -24,7 +24,6 @@ import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 
-import java.nio.file.Path;
 import java.util.List;
 
 
@@ -91,9 +90,13 @@ public class RedRightSimple extends LinearOpMode {
             telemetry.update();
             sleep(20);
             if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
-                gvf.setPath(PathList.RedRightAlternatePathToSpike, 4, 15, 0.5);
+                gvf.setPath(PathList.RedRightPathToLeftSpike, 4, 15, 0.5);
+            }
+            else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
+                gvf.setPath(PathList.RedRightPathToRightSpike, 4, 15, 0.5);
             }
             else gvf.setPath(PathList.RedRightPathToSpike, 4, 15, 0.5);
+            intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
         waitForStart();
@@ -104,7 +107,6 @@ public class RedRightSimple extends LinearOpMode {
         intake.setIntakePower(0);
         portal.close();
         taskNumber = 0;
-        intake.setCanopeePosition(intake.CANOPEE_UP);
         deposit.toggleLatch(true);
 
 
@@ -121,7 +123,8 @@ public class RedRightSimple extends LinearOpMode {
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
                     if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
-                        intake.setIntakePower(-0.5);
+                        //intake.setIntakePower(-0.5);
+                        intake.setCanopeePosition(intake.CANOPEE_UP);
                         taskNumber++;
                         goofytimer.reset();
                     }
@@ -136,7 +139,6 @@ public class RedRightSimple extends LinearOpMode {
 
                 case CYCLE:
                     if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
-                        depositScoring = true;
                         taskNumber++;
                         goofytimer.reset();
                         if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(PathList.RedBoardAdjustmentRight, 4, 15, 0.5);
@@ -146,6 +148,7 @@ public class RedRightSimple extends LinearOpMode {
                     if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
+                        depositScoring = true;
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 1) {
                         deposit.toggleLatch(false);
