@@ -113,12 +113,12 @@ public class BlueLeftSimple extends LinearOpMode {
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            drive.drive(gvfOut.getX(), -gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent));
+            drive.drive(-gvfOut.getX(), -gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, true));
 
             switch(apexstate){
                 case SPIKE:
-                    if (detected == HSVDetectElement.State.LEFT) targetHeading = -90;
-                    else if (detected == HSVDetectElement.State.RIGHT) targetHeading = 90;
+                    if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
+                    else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
                     if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
                         //intake.setIntakePower(-0.5);
@@ -130,7 +130,7 @@ public class BlueLeftSimple extends LinearOpMode {
                         intake.off();
                         gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
-                        targetHeading = 90;
+                        targetHeading = -90;
                         apexstate = apexStates.CYCLE;
                     }
                     break;

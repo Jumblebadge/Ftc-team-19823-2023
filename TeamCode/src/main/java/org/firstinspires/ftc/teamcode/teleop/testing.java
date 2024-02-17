@@ -71,7 +71,7 @@ public class testing extends LinearOpMode {
             Pose2d pose = drive.getPose();
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
-            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(0,drive.getHeadingInDegrees(), true));
+            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(0,drive.getHeadingInDegrees(), true, false));
 
             double nano = System.nanoTime();
             telemetry.addData("hz", 1000000000 / (nano - nanoTime));

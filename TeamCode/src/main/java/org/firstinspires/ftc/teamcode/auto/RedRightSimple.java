@@ -115,7 +115,7 @@ public class RedRightSimple extends LinearOpMode {
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent));
+            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, false));
 
             switch(apexstate){
                 case SPIKE:

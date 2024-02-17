@@ -93,10 +93,11 @@ public class GVF {
         return new Vector2d(-xOut, yOut);
     }
 
-    public double headingOut(double heading, double targetHeading, boolean followTangent) {
+    public double headingOut(double heading, double targetHeading, boolean followTangent, boolean reversed) {
         double target = targetHeading;
         if (!isEnding() && followTangent) {
-            target = tangentHeading();
+            if (reversed) target = AngleUnit.normalizeDegrees(180 + tangentHeading());
+            else target = tangentHeading();
         }
         headingDistance = Math.abs(AngleUnit.normalizeDegrees(target - heading));
         return headingPID.pidOut(AngleUnit.normalizeDegrees(target - heading));
