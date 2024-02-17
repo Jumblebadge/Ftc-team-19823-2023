@@ -161,6 +161,7 @@ public class godMecanum extends LinearOpMode {
             }
             telemetry.addData("intake",intake.isSlideDone());
             telemetry.addData("deposit", deposit.isSlideDone());
+            telemetry.addData("game",-gamepad1.left_stick_x);
 
             //intake.toggleLatch(intakeLatch.toggle(gamepad2.back));
             intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));

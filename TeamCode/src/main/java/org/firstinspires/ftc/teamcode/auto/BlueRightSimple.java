@@ -8,14 +8,12 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.maths.GVF;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.maths.GVF;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
@@ -28,8 +26,8 @@ import java.util.List;
 
 
 @Config
-@Autonomous(name="Red Right", group="Linear Opmode")
-public class RedRight extends LinearOpMode {
+@Autonomous(name="Blue Right Simple", group="Linear Opmode")
+public class BlueRightSimple extends LinearOpMode {
 
     //Initialize FTCDashboard
     FtcDashboard dashboard;
@@ -42,12 +40,11 @@ public class RedRight extends LinearOpMode {
 
     enum apexStates {
         SPIKE,
-        CYCLE,
-        PARK
+        CYCLE
     }
 
     apexStates apexstate = apexStates.SPIKE;
-    Pose2d pose = new Pose2d(-45,-60,90 / (180 / Math.PI));
+    Pose2d pose = new Pose2d(-36,-62.5,90 / (180 / Math.PI));
 
     VisionProcessor processor;
     VisionPortal portal;
@@ -68,7 +65,7 @@ public class RedRight extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(12,-62.75,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(-36,62.75,-90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
@@ -79,7 +76,7 @@ public class RedRight extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, RedPathList.RightPathToSpike, 2, 15, 0.7, telemetry);
+        GVF gvf = new GVF(dashboard, BluePathList.RightPathToSpike, 4, 15, 0.5, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -90,6 +87,14 @@ public class RedRight extends LinearOpMode {
             telemetry.addData("seen", HSVDetectElement.returnDetected());
             telemetry.update();
             sleep(20);
+            if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
+                gvf.setPath(BluePathList.RightPathToLeftSpike, 4, 15, 0.5);
+            }
+            else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
+                gvf.setPath(BluePathList.RightPathToRightSpike, 4, 15, 0.5);
+            }
+            else gvf.setPath(BluePathList.RightPathToSpike, 4, 15, 0.5);
+            intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
         waitForStart();
@@ -99,7 +104,7 @@ public class RedRight extends LinearOpMode {
         drive.resetIMU();
         intake.setIntakePower(0);
         portal.close();
-        intake.setCanopeePosition(intake.CANOPEE_UP);
+        taskNumber = 0;
         deposit.toggleLatch(true);
 
 
@@ -115,14 +120,15 @@ public class RedRight extends LinearOpMode {
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
-                    if (gvf.isDone(5, 5) && taskNumber == 0) {
-                        intake.setIntakePower(-0.5);
+                    if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
+                        //intake.setIntakePower(-0.5);
+                        intake.setCanopeePosition(intake.CANOPEE_UP);
                         taskNumber++;
                         goofytimer.reset();
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 1) {
                         intake.off();
-                        gvf.setPath(RedPathList.RedRightSpikeToStack, 3.5, 22.5, 0.5);
+                        gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
                         apexstate = apexStates.CYCLE;
@@ -130,55 +136,28 @@ public class RedRight extends LinearOpMode {
                     break;
 
                 case CYCLE:
-                    if (gvf.isDone(5, 10) && taskNumber == 0) {
-                        followTangent = false;
-                        gvf.setPath(RedPathList.RedStackAdjustment, 3.25, 10, 0.333);
-                        intake.eject();
-                        intake.toggleLatch(false);
+                    if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
+                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
+                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
+                        else gvf.setPath(BluePathList.BoardAdjustment, 4, 15, 0.5);
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 2) {
-                        intake.setCanopeePosition(intake.CANOPEE_DOWN);
-                        intake.on();
+                    if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
+                        depositScoring = true;
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        intake.toggleLatch(true);
-                        followTangent = true;
-                        gvf.setPath(RedPathList.RedStackToBoard, 3.25, 20, 0.5);
-                        taskNumber++;
-                        goofytimer.reset();
-                    }
-                    if (taskNumber == 3 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
-                        depositScoring = true;
-                        taskNumber++;
-                        goofytimer.reset();
-                        intake.off();
-                        gvf.setPath(RedPathList.RedBoardAdjustment, 3.25, 15, 0.75);
-                    }
-                    if (taskNumber == 4 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
-                        taskNumber++;
-                        goofytimer.reset();
-                    }
-                    if (taskNumber == 5 && goofytimer.seconds() > 1) {
                         deposit.toggleLatch(false);
                     }
-                    if (taskNumber == 5 && goofytimer.seconds() > 2) {
+                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
-                        taskNumber = 0;
                         targetHeading = 0;
-                        gvf.setPath(RedPathList.RedPark, 3.25, 5, 0.5);
+                        gvf.setPath(BluePathList.Park, 4, 7, 0.5);
                         goofytimer.reset();
-                        apexstate = apexStates.PARK;
+                        taskNumber++;
                     }
-
-
-                    break;
-
-                case PARK:
-
                     break;
             }
 
@@ -213,7 +192,7 @@ public class RedRight extends LinearOpMode {
             nanoTime = nano;
             telemetry.addData("temp",temp);
             telemetry.addData("isdone",gvf.isDone(10, 10));
-            telemetry.addData("guess", RedPathList.RightPathToSpike.getPoint(RedPathList.RightPathToSpike.guessT));
+            telemetry.addData("guess", BluePathList.RightPathToSpike.getPoint(BluePathList.RightPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());
             telemetry.update();

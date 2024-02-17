@@ -78,7 +78,7 @@ public class RedLeftSimple extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, PathList.RedLeftPathToSpike, 4, 15, 0.5, telemetry);
+        GVF gvf = new GVF(dashboard, RedPathList.RedLeftPathToSpike, 4, 15, 0.5, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -90,12 +90,12 @@ public class RedLeftSimple extends LinearOpMode {
             telemetry.update();
             sleep(20);
             if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
-                gvf.setPath(PathList.RedLeftPathToLeftSpike, 4, 15, 0.5);
+                gvf.setPath(RedPathList.RedLeftPathToLeftSpike, 4, 15, 0.5);
             }
             else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
-                gvf.setPath(PathList.RedLeftPathToRightSpike, 4, 15, 0.5);
+                gvf.setPath(RedPathList.RedLeftPathToRightSpike, 4, 15, 0.5);
             }
-            else gvf.setPath(PathList.RedLeftPathToSpike, 4, 15, 0.5);
+            else gvf.setPath(RedPathList.RedLeftPathToSpike, 4, 15, 0.5);
             intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
@@ -130,7 +130,7 @@ public class RedLeftSimple extends LinearOpMode {
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 1) {
                         intake.off();
-                        gvf.setPath(PathList.RedLeftSpikeToBoard, 3.5, 22.5, 0.5);
+                        gvf.setPath(RedPathList.RedLeftSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
                         apexstate = apexStates.CYCLE;
@@ -141,9 +141,9 @@ public class RedLeftSimple extends LinearOpMode {
                     if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
-                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(PathList.RedBoardAdjustmentRight, 4, 15, 0.5);
-                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(PathList.RedBoardAdjustmentLeft, 4, 15, 0.5);
-                        else gvf.setPath(PathList.RedBoardAdjustment, 4, 15, 0.5);
+                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.RedBoardAdjustmentRight, 4, 15, 0.5);
+                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.RedBoardAdjustmentLeft, 4, 15, 0.5);
+                        else gvf.setPath(RedPathList.RedBoardAdjustment, 4, 15, 0.5);
                     }
                     if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
@@ -156,7 +156,7 @@ public class RedLeftSimple extends LinearOpMode {
                     if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
                         targetHeading = 0;
-                        gvf.setPath(PathList.RedPark, 4, 7, 0.5);
+                        gvf.setPath(RedPathList.RedPark, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
                     }
@@ -194,7 +194,7 @@ public class RedLeftSimple extends LinearOpMode {
             nanoTime = nano;
             telemetry.addData("temp",temp);
             telemetry.addData("isdone",gvf.isDone(10, 10));
-            telemetry.addData("guess",PathList.RedRightPathToSpike.getPoint(PathList.RedRightPathToSpike.guessT));
+            telemetry.addData("guess", RedPathList.RightPathToSpike.getPoint(RedPathList.RightPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());
             telemetry.update();
