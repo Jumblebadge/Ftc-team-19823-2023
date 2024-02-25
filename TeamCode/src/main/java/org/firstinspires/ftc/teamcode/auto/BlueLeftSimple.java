@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionPortalImpl;
 import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.List;
@@ -123,10 +124,12 @@ public class BlueLeftSimple extends LinearOpMode {
                     if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
                         //intake.setIntakePower(-0.5);
                         intake.setCanopeePosition(intake.CANOPEE_UP);
+                        intake.setCanopeePosition(intake.CANOPEE_DOWN);
+                        intake.setCanopeePosition(intake.CANOPEE_UP);
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 1) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
                         intake.off();
                         gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
@@ -139,8 +142,8 @@ public class BlueLeftSimple extends LinearOpMode {
                     if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
-                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
-                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
+                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
+                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
                         else gvf.setPath(BluePathList.BoardAdjustment, 4, 15, 0.5);
                     }
                     if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
@@ -154,6 +157,7 @@ public class BlueLeftSimple extends LinearOpMode {
                     if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
                         targetHeading = 0;
+                        followTangent = false;
                         gvf.setPath(BluePathList.Park, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;

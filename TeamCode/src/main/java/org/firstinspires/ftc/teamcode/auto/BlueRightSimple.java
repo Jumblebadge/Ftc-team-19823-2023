@@ -76,7 +76,7 @@ public class BlueRightSimple extends LinearOpMode {
 
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, BluePathList.RightPathToSpike, 4, 15, 0.5, telemetry);
+        GVF gvf = new GVF(dashboard, BluePathList.LeftPathToSpike, 4, 15, 0.5, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -88,12 +88,12 @@ public class BlueRightSimple extends LinearOpMode {
             telemetry.update();
             sleep(20);
             if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
-                gvf.setPath(BluePathList.RightPathToLeftSpike, 4, 15, 0.5);
+                gvf.setPath(BluePathList.LeftPathToRightSpike, 4, 15, 0.5);
             }
             else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
-                gvf.setPath(BluePathList.RightPathToRightSpike, 4, 15, 0.5);
+                gvf.setPath(BluePathList.LeftPathToLeftSpike, 4, 15, 0.5);
             }
-            else gvf.setPath(BluePathList.RightPathToSpike, 4, 15, 0.5);
+            else gvf.setPath(BluePathList.LeftPathToSpike, 4, 15, 0.5);
             intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
@@ -113,7 +113,7 @@ public class BlueRightSimple extends LinearOpMode {
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, true));
+            drive.drive(-gvfOut.getX(), -gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, true));
 
             switch(apexstate){
                 case SPIKE:
@@ -128,36 +128,16 @@ public class BlueRightSimple extends LinearOpMode {
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 1) {
                         intake.off();
-                        gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
+
                         taskNumber = 0;
-                        targetHeading = 90;
+                        //targetHeading = 0;
+                        goofytimer.reset();
                         apexstate = apexStates.CYCLE;
                     }
                     break;
 
                 case CYCLE:
-                    if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
-                        taskNumber++;
-                        goofytimer.reset();
-                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
-                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
-                        else gvf.setPath(BluePathList.BoardAdjustment, 4, 15, 0.5);
-                    }
-                    if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
-                        taskNumber++;
-                        goofytimer.reset();
-                        depositScoring = true;
-                    }
-                    if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        deposit.toggleLatch(false);
-                    }
-                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
-                        depositScoring = false;
-                        targetHeading = 0;
-                        gvf.setPath(BluePathList.Park, 4, 7, 0.5);
-                        goofytimer.reset();
-                        taskNumber++;
-                    }
+                    goofytimer.reset();
                     break;
             }
 
