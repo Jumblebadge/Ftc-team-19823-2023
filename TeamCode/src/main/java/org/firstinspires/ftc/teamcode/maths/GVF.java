@@ -93,6 +93,20 @@ public class GVF {
         return new Vector2d(-xOut, yOut);
     }
 
+    public Vector2d cameraPID(Vector2d xy) {
+        double yOut = yPID.pidOut(13 - xy.getY());
+        double xOut = xPID.pidOut(-xy.getX());
+        double max = Math.max(Math.abs(yOut), Math.abs(xOut));
+        if (max > 1) {
+            return new Vector2d(xOut / max, yOut / max);
+        }
+        return new Vector2d(yOut, xOut);
+    }
+
+    public boolean isCameraDone(Vector2d xy) {
+        return 13 - xy.getY() < 3 && -xy.getX() < 3;
+    }
+
     public double headingOut(double heading, double targetHeading, boolean followTangent, boolean reversed) {
         double target = targetHeading;
         if (!isEnding() && followTangent) {

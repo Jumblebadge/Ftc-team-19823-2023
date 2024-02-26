@@ -15,9 +15,9 @@ import org.opencv.imgproc.Imgproc;
 
 public class HSVDetectElement implements VisionProcessor {
 
-    Rect left = new Rect(0, 200, 70, 100);
-    Rect middle = new Rect(300, 170, 70, 90);
-    Rect right = new Rect(569, 200, 70, 100);
+    Rect left = new Rect(130, 270, 70, 100);
+    Rect middle = new Rect(370, 250, 100, 80);
+    Rect right = new Rect(620, 270, 70, 100);
 
     private static State detected = State.MID;
 

@@ -52,13 +52,13 @@ public class RedPathList {
 
     public static final Vector2d[] RightSpikeToBoardPoints = {
             RightPathToSpikePoints[7].plus(new Vector2d(0,10)),
-            new Vector2d(12.6,-60.2),
-            new Vector2d(25.4,-43.4),
-            new Vector2d(28.8,-42.8),
-            new Vector2d(36.0,-40.2),
-            new Vector2d(39.6,-39.5),
-            new Vector2d(45.7,-37.7),
-            new Vector2d(50,-36),
+            new Vector2d(12.0,-41.4),
+            new Vector2d(13.3,-50.0),
+            new Vector2d(17.3,-52.0),
+            new Vector2d(26.2,-54.0),
+            new Vector2d(30.3,-52.2),
+            new Vector2d(38.0,-43.8),
+            new Vector2d(36,-36),
     };
     public static final CubicPath RightSpikeToBoard = new CubicPath(RightSpikeToBoardPoints);
 
