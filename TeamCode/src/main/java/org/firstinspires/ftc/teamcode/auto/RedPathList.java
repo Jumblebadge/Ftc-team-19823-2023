@@ -189,38 +189,38 @@ public class RedPathList {
     public static final CubicPath RedStackToBoard = new CubicPath(RedStackToBoardPoints);
 
     public static final Vector2d[] RedBoardAdjustmentPoints = {
-            RedStackToBoardPoints[7],
-            new Vector2d(35.2,-18.2),
-            new Vector2d(35.0,-21.0),
-            new Vector2d(36.0,-23.2),
-            new Vector2d(37.4,-27.5),
-            new Vector2d(40.4,-30.8),
-            new Vector2d(45.7,-33.8),
-            new Vector2d(50,-35)
+            RightSpikeToBoardPoints[7],
+            new Vector2d(40.7,-36.2),
+            new Vector2d(37.0,-36.0),
+            new Vector2d(39.3,-36.0),
+            new Vector2d(41.6,-36.0),
+            new Vector2d(45.0,-36.0),
+            new Vector2d(47.4,-35.8),
+            new Vector2d(50.0,-36.0),
     };
     public static final CubicPath RedBoardAdjustment = new CubicPath(RedBoardAdjustmentPoints);
 
     public static final Vector2d[] RedBoardAdjustmentRightPoints = {
-            RedStackToBoardPoints[7],
-            new Vector2d(35.2,-18.2),
-            new Vector2d(35.0,-21.0),
-            new Vector2d(36.0,-23.2),
-            new Vector2d(37.4,-27.5),
-            new Vector2d(40.4,-30.8),
-            new Vector2d(45.7,-33.8),
-            new Vector2d(50,-46)
+            RightSpikeToBoardPoints[7],
+            new Vector2d(40.7,-36.2),
+            new Vector2d(37.0,-36.0),
+            new Vector2d(39.3,-36.0),
+            new Vector2d(41.6,-36.0),
+            new Vector2d(44.7,-36.6),
+            new Vector2d(49.6,-40.0),
+            new Vector2d(50.0,-46.0),
     };
     public static final CubicPath RedBoardAdjustmentRight = new CubicPath(RedBoardAdjustmentRightPoints);
 
     public static final Vector2d[] RedBoardAdjustmentLeftPoints = {
-            RedStackToBoardPoints[7],
-            new Vector2d(35.2,-18.2),
-            new Vector2d(35.0,-21.0),
-            new Vector2d(36.0,-23.2),
-            new Vector2d(37.4,-27.5),
-            new Vector2d(40.4,-30.8),
-            new Vector2d(45.7,-33.8),
-            new Vector2d(50,-26.5)
+            RightSpikeToBoardPoints[7],
+            new Vector2d(40.7,-36.2),
+            new Vector2d(37.0,-36.0),
+            new Vector2d(39.3,-36.0),
+            new Vector2d(41.6,-36.0),
+            new Vector2d(44.7,-35.5),
+            new Vector2d(50.0,-31.7),
+            new Vector2d(50.0,-26.5),
     };
     public static final CubicPath RedBoardAdjustmentLeft = new CubicPath(RedBoardAdjustmentLeftPoints);
 

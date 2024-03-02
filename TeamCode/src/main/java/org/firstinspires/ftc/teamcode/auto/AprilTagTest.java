@@ -122,7 +122,7 @@ public class AprilTagTest extends LinearOpMode {
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
             camera.telemetryAprilTag();
-            telemetry.addData("values",new Vector2d(relevantValues[0], relevantValues[1]));
+            telemetry.addData("values",new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
             telemetry.addData("out",gvfOut);
             drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, false));
 
@@ -144,23 +144,25 @@ public class AprilTagTest extends LinearOpMode {
                         gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
+                        camera.enableAprilTag(true);
                         apexstate = apexStates.CYCLE;
                     }
                     break;
 
                 case CYCLE:
                     if (taskNumber == 0 && gvf.isDone(5, 7) && goofytimer.seconds() > 0.25) {
-                        camera.enableAprilTag(true);
-                        drive.setPoseEstimate(new Pose2d(36 + (24 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
+                        if (camera.seen()) {
+                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
+                        }
                         taskNumber++;
                         followTangent = false;
                         goofytimer.reset();
+                        camera.enableAprilTag(false);
                         if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.RedBoardAdjustmentRight, 4, 15, 0.5);
                         else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.RedBoardAdjustmentLeft, 4, 15, 0.5);
                         else gvf.setPath(RedPathList.RedBoardAdjustment, 4, 15, 0.5);
                     }
                     if (taskNumber == 1 && gvf.isDone(5,10) && goofytimer.seconds() > 0.25) {
-                        camera.enableAprilTag(false);
                         taskNumber++;
                         goofytimer.reset();
                         depositScoring = true;

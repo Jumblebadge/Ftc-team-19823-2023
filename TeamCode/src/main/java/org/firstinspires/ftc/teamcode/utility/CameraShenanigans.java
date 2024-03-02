@@ -28,12 +28,12 @@ public class CameraShenanigans {
     private FtcDashboard dashboard;
 
     List<AprilTagDetection> currentDetections;
-    public double[] tag1Values = new double[3];
-    public double[] tag2Values = new double[3];
-    public double[] tag3Values = new double[3];
-    public double[] tag4Values = new double[3];
-    public double[] tag5Values = new double[3];
-    public double[] tag6Values = new double[3];
+    public double[] tag1Values = {0, 18, 0};
+    public double[] tag2Values = {0, 18, 0};
+    public double[] tag3Values = {0, 18, 0};
+    public double[] tag4Values = {0, 18, 0};
+    public double[] tag5Values = {0, 18, 0};
+    public double[] tag6Values = {0, 18, 0};
 
     public CameraShenanigans(Telemetry telemetry, HardwareMap hardwareMap, FtcDashboard dashboard) {
         this.telemetry = telemetry;
