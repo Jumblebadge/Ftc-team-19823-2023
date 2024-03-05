@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -21,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
+import org.firstinspires.ftc.teamcode.utility.CameraShenanigans;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -29,9 +29,8 @@ import java.util.List;
 
 
 @Config
-@Disabled
-@Autonomous(name="Red Right", group="Linear Opmode")
-public class RedRight extends LinearOpMode {
+@Autonomous(name="Red Left Park Side", group="Linear Opmode")
+public class RedLeftSimpleParkSide extends LinearOpMode {
 
     //Initialize FTCDashboard
     FtcDashboard dashboard;
@@ -40,19 +39,17 @@ public class RedRight extends LinearOpMode {
     private double nanoTime = 0, hz = 0, count = 0;
     private boolean depositScoring = false, followTangent = true;
 
+    double[] relevantValues;
+
     double temp = 0;
 
     enum apexStates {
         SPIKE,
-        CYCLE,
-        PARK
+        CYCLE
     }
 
     apexStates apexstate = apexStates.SPIKE;
-    Pose2d pose = new Pose2d(-45,-60,90 / (180 / Math.PI));
-
-    VisionProcessor processor;
-    VisionPortal portal;
+    Pose2d pose = new Pose2d(-36,-62.5,90 / (180 / Math.PI));
 
     ElapsedTime goofytimer = new ElapsedTime();
     ElapsedTime swingTimer = new ElapsedTime();
@@ -65,23 +62,22 @@ public class RedRight extends LinearOpMode {
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        processor = new HSVDetectElement();
-        portal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), processor);
-
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
-        drive.setPoseEstimate(new Pose2d(12,-62.75,90 / (180 / Math.PI)));
+        drive.setPoseEstimate(new Pose2d(-36,-62.75,90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
-
 
         //Initialize FTCDashboard
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
+        CameraShenanigans camera = new CameraShenanigans(telemetry, hardwareMap, dashboard);
+        camera.enableAprilTag(false);
+        camera.enableHSVDetection(true);
 
         //Create objects for the classes we use
-        GVF gvf = new GVF(dashboard, RedPathList.RightPathToSpike, 2, 15, 0.7, telemetry);
+        GVF gvf = new GVF(dashboard, RedPathList.LeftPathToSpike, 4, 15, 0.5, telemetry);
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -92,6 +88,14 @@ public class RedRight extends LinearOpMode {
             telemetry.addData("seen", HSVDetectElement.returnDetected());
             telemetry.update();
             sleep(20);
+            if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
+                gvf.setPath(RedPathList.LeftPathToLeftSpike, 4, 15, 0.5);
+            }
+            else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
+                gvf.setPath(RedPathList.LeftPathToRightSpike, 4, 15, 0.5);
+            }
+            else gvf.setPath(RedPathList.LeftPathToSpike, 4, 15, 0.5);
+            intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
         waitForStart();
@@ -100,16 +104,18 @@ public class RedRight extends LinearOpMode {
         goofytimer.reset();
         drive.resetIMU();
         intake.setIntakePower(0);
-        portal.close();
-        intake.setCanopeePosition(intake.CANOPEE_UP);
+        taskNumber = 0;
+        camera.enableHSVDetection(false);
         deposit.toggleLatch(true);
 
 
         while (opModeIsActive()) {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
+            camera.update();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+            camera.telemetryAprilTag();
             drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, false));
 
             switch(apexstate){
@@ -117,70 +123,51 @@ public class RedRight extends LinearOpMode {
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
                     else targetHeading = 180;
-                    if (gvf.isDone(5, 5) && taskNumber == 0) {
-                        intake.setIntakePower(-0.5);
+                    if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
+                        //intake.setIntakePower(-0.5);
+                        intake.setCanopeePosition(intake.CANOPEE_UP);
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 1) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
                         intake.off();
-                        gvf.setPath(RedPathList.RightSpikeToStack, 3.5, 22.5, 0.5);
+                        gvf.setPath(RedPathList.LeftSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
-                        apexstate = apexStates.CYCLE;
+                        camera.enableAprilTag(true);
+                        apexstate = RedLeftSimpleParkSide.apexStates.CYCLE;
                     }
                     break;
 
                 case CYCLE:
-                    if (gvf.isDone(5, 10) && taskNumber == 0) {
+                    if (taskNumber == 0 && gvf.isDone(5, 7) && goofytimer.seconds() > 0.25) {
+                        if (camera.seen()) {
+                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
+                        }
+                        taskNumber++;
                         followTangent = false;
-                        gvf.setPath(RedPathList.StackAdjustment, 3.25, 10, 0.333);
-                        intake.eject();
-                        intake.toggleLatch(false);
-                        taskNumber++;
                         goofytimer.reset();
+                        camera.enableAprilTag(false);
+                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.BoardAdjustmentRight, 4, 15, 0.5);
+                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.BoardAdjustmentLeft, 4, 15, 0.5);
+                        else gvf.setPath(RedPathList.BoardAdjustment, 4, 15, 0.5);
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 2) {
-                        intake.setCanopeePosition(intake.CANOPEE_DOWN);
-                        intake.on();
+                    if (taskNumber == 1 && gvf.isDone(5,10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
+                        depositScoring = true;
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        intake.toggleLatch(true);
-                        followTangent = true;
-                        gvf.setPath(RedPathList.StackToBoard, 3.25, 20, 0.5);
-                        taskNumber++;
-                        goofytimer.reset();
-                    }
-                    if (taskNumber == 3 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
-                        depositScoring = true;
-                        taskNumber++;
-                        goofytimer.reset();
-                        intake.off();
-                        gvf.setPath(RedPathList.BoardAdjustment, 3.25, 15, 0.75);
-                    }
-                    if (taskNumber == 4 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
-                        taskNumber++;
-                        goofytimer.reset();
-                    }
-                    if (taskNumber == 5 && goofytimer.seconds() > 1) {
                         deposit.toggleLatch(false);
                     }
-                    if (taskNumber == 5 && goofytimer.seconds() > 2) {
+                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
-                        taskNumber = 0;
                         targetHeading = 0;
-                        gvf.setPath(RedPathList.ParkMid, 3.25, 5, 0.5);
+                        followTangent = false;
+                        gvf.setPath(RedPathList.ParkSide, 4, 7, 0.5);
                         goofytimer.reset();
-                        apexstate = apexStates.PARK;
+                        taskNumber++;
                     }
-
-
-                    break;
-
-                case PARK:
-
                     break;
             }
 

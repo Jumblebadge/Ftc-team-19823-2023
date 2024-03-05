@@ -18,17 +18,17 @@ import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
+import org.firstinspires.ftc.teamcode.utility.CameraShenanigans;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionPortalImpl;
 import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.List;
 
 
 @Config
-@Autonomous(name="Blue Left Simple", group="Linear Opmode")
-public class BlueLeftSimple extends LinearOpMode {
+@Autonomous(name="Blue Left Park Side", group="Linear Opmode")
+public class BlueLeftSimpleParkSide extends LinearOpMode {
 
     //Initialize FTCDashboard
     FtcDashboard dashboard;
@@ -47,8 +47,6 @@ public class BlueLeftSimple extends LinearOpMode {
     apexStates apexstate = apexStates.SPIKE;
     Pose2d pose = new Pose2d(12,60,90 / (180 / Math.PI));
 
-    VisionProcessor processor;
-    VisionPortal portal;
 
     ElapsedTime goofytimer = new ElapsedTime();
     ElapsedTime swingTimer = new ElapsedTime();
@@ -61,15 +59,15 @@ public class BlueLeftSimple extends LinearOpMode {
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        processor = new HSVDetectElement();
-        portal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), processor);
-
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
         drive.setPoseEstimate(new Pose2d(12,62.75,-90 / (180 / Math.PI)));
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
+        CameraShenanigans camera = new CameraShenanigans(telemetry, hardwareMap, dashboard);
+        camera.enableAprilTag(false);
+        camera.enableHSVDetection(true);
 
         //Initialize FTCDashboard
         dashboard = FtcDashboard.getInstance();
@@ -104,7 +102,7 @@ public class BlueLeftSimple extends LinearOpMode {
         goofytimer.reset();
         drive.resetIMU();
         intake.setIntakePower(0);
-        portal.close();
+        camera.enableHSVDetection(false);
         taskNumber = 0;
         deposit.toggleLatch(true);
 
@@ -112,8 +110,10 @@ public class BlueLeftSimple extends LinearOpMode {
         while (opModeIsActive()) {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
+            camera.update();
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+            camera.telemetryAprilTag();
             drive.drive(-gvfOut.getX(), -gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, true));
 
             switch(apexstate){
@@ -134,14 +134,19 @@ public class BlueLeftSimple extends LinearOpMode {
                         gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = -90;
+                        camera.enableAprilTag(true);
                         apexstate = apexStates.CYCLE;
                     }
                     break;
 
                 case CYCLE:
                     if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
+                        if (camera.seen()) {
+                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),36 - camera.tag5Values[0]));
+                        }
                         taskNumber++;
                         goofytimer.reset();
+                        camera.enableAprilTag(false);
                         if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
                         else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
                         else gvf.setPath(BluePathList.BoardAdjustment, 4, 15, 0.5);
@@ -158,7 +163,7 @@ public class BlueLeftSimple extends LinearOpMode {
                         depositScoring = false;
                         targetHeading = 0;
                         followTangent = false;
-                        gvf.setPath(BluePathList.Park, 4, 7, 0.5);
+                        gvf.setPath(BluePathList.ParkSide, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
                     }

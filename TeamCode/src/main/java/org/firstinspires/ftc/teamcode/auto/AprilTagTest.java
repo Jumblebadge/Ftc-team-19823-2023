@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -22,8 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.utility.CameraShenanigans;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.List;
 
@@ -158,9 +155,9 @@ public class AprilTagTest extends LinearOpMode {
                         followTangent = false;
                         goofytimer.reset();
                         camera.enableAprilTag(false);
-                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.RedBoardAdjustmentRight, 4, 15, 0.5);
-                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.RedBoardAdjustmentLeft, 4, 15, 0.5);
-                        else gvf.setPath(RedPathList.RedBoardAdjustment, 4, 15, 0.5);
+                        if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.BoardAdjustmentRight, 4, 15, 0.5);
+                        else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.BoardAdjustmentLeft, 4, 15, 0.5);
+                        else gvf.setPath(RedPathList.BoardAdjustment, 4, 15, 0.5);
                     }
                     if (taskNumber == 1 && gvf.isDone(5,10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
@@ -174,7 +171,7 @@ public class AprilTagTest extends LinearOpMode {
                         depositScoring = false;
                         targetHeading = 0;
                         followTangent = false;
-                        gvf.setPath(RedPathList.RedPark, 4, 7, 0.5);
+                        gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
                     }
