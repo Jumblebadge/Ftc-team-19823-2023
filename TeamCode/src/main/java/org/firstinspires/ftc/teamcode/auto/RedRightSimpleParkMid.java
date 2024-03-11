@@ -118,10 +118,11 @@ public class RedRightSimpleParkMid extends LinearOpMode {
 
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            camera.telemetryAprilTag();
+            //camera.telemetryAprilTag();
             telemetry.addData("values",new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
             telemetry.addData("out",gvfOut);
             drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, false));
+            //drive.drive(0,0,0);
 
             switch(apexstate){
 
@@ -138,10 +139,10 @@ public class RedRightSimpleParkMid extends LinearOpMode {
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 4) {
                         intake.off();
-                        gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
+                        gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 10, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
-                        camera.enableAprilTag(true);
+                        //camera.enableAprilTag(true);
                         apexstate = apexStates.CYCLE;
                     }
                     break;
@@ -208,7 +209,7 @@ public class RedRightSimpleParkMid extends LinearOpMode {
             telemetry.addData("hz", hz);
             nanoTime = nano;
             telemetry.addData("temp",temp);
-            telemetry.addData("isdone",gvf.isDone(10, 10));
+            telemetry.addData("isdone",gvf.isDone(5, 7));
             telemetry.addData("guess", RedPathList.RightPathToSpike.getPoint(RedPathList.RightPathToSpike.guessT));
             telemetry.addData("y",gvfOut.getY());
             telemetry.addData("x",gvfOut.getX());

@@ -129,7 +129,7 @@ public class RedLeftSimpleParkMid extends LinearOpMode {
                     }
                     if (taskNumber == 1 && goofytimer.seconds() > 4) {
                         intake.off();
-                        gvf.setPath(RedPathList.LeftSpikeToBoard, 3.5, 22.5, 0.5);
+                        gvf.setPath(RedPathList.LeftSpikeToBoard, 6, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
                         camera.enableAprilTag(true);
@@ -160,11 +160,13 @@ public class RedLeftSimpleParkMid extends LinearOpMode {
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
-                        targetHeading = 0;
-                        followTangent = false;
-                        gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
+                    }
+                    if (taskNumber == 3 && goofytimer.seconds() > 2.5) {
+                        gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
+                        targetHeading = 0;
+                        followTangent = false;
                     }
                     break;
             }

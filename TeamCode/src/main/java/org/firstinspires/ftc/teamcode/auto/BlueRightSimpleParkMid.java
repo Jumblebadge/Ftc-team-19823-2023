@@ -24,7 +24,7 @@ import java.util.List;
 
 
 @Config
-@Autonomous(name="Blue Right Park Side", group="Linear Opmode")
+@Autonomous(name="Blue Right Park Mid", group="Linear Opmode")
 public class BlueRightSimpleParkMid extends LinearOpMode {
 
     //Initialize FTCDashboard

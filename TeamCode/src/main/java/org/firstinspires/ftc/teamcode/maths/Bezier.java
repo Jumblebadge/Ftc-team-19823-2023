@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Bezier {
 
     private Vector2d A,B,C,D;
-    public Vector2d[] lookup = new Vector2d[51];
+    public Vector2d[] lookup = new Vector2d[76];
     private double totalArcLength;
 
     public Bezier(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
@@ -31,8 +31,8 @@ public class Bezier {
     }
 
     public void generateLookup() {
-        for (int i = 0; i <= 50; i++) {
-            lookup[i] = new Vector2d((double) i / 50, getArcLength((double) i / 50));
+        for (int i = 0; i <= 75; i++) {
+            lookup[i] = new Vector2d((double) i / 75, getArcLength((double) i / 75));
         }
     }
 
@@ -69,17 +69,17 @@ public class Bezier {
 
     public void calculateTotalArcLength() {
         double total = 0;
-        for (double i = 0; i <= 50; i++) {
-            total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
+        for (double i = 0; i <= 75; i++) {
+            total += getPoint(i / 75).distTo(getPoint((i + 1) / 75));
         }
         totalArcLength = total;
     }
 
     public double getArcLength(double T) {
         double total = 0;
-        for (double i = 0; i <= 50; i++) {
-            if(i / 50 < T) {
-                total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
+        for (double i = 0; i <= 75; i++) {
+            if(i / 75 < T) {
+                total += getPoint(i / 75).distTo(getPoint((i + 1) / 75));
             }
             else break;
         }

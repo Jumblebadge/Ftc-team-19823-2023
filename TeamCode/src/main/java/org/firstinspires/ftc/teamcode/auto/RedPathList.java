@@ -151,12 +151,12 @@ public class RedPathList {
 
     public static final Vector2d[] LeftSpikeToBoardPoints = {
             LeftPathToSpikePoints[7].plus(new Vector2d(0,10)),
-            new Vector2d(-37.5,-48.4),
-            new Vector2d(-57.6,-49.0),
-            new Vector2d(-58.0,-38.3),
-            new Vector2d(-62.5,-10.1),
-            new Vector2d(-39.3,-11.0),
-            new Vector2d(54.0,-3.0),
+            new Vector2d(-42.0,-43.8),
+            new Vector2d(-52.5,-47.0),
+            new Vector2d(-58.0,-32.0),
+            new Vector2d(-32.4,-11.2),
+            new Vector2d(-5.3,-11.0),
+            new Vector2d(40.4,-12.0),
             new Vector2d(36.0,-36.0),
     };
     public static final CubicPath LeftSpikeToBoard = new CubicPath(LeftSpikeToBoardPoints);
@@ -236,13 +236,13 @@ public class RedPathList {
     public static final CubicPath ParkMid = new CubicPath(ParkMidPoints);
 
     public static final Vector2d[] ParkSidePoints = {
-            BoardAdjustmentLeftPoints[7],
-            new Vector2d(49.7,-28.6),
-            new Vector2d(48.96,-30.3),
-            new Vector2d(48.64,-35.1),
-            new Vector2d(48.5,-36.1),
-            new Vector2d(48.54,-51.0),
-            new Vector2d(58.3,-61.1),
+            new Vector2d(51.5, -19),
+            new Vector2d(51.5,-27.7),
+            new Vector2d(50.5,-34.4),
+            new Vector2d(49.2,-39.3),
+            new Vector2d(49.0,-46.7),
+            new Vector2d(49.6,-50.2),
+            new Vector2d(53.3,-56.0),
             new Vector2d(60.0,-60.0),
     };
     public static final CubicPath ParkSide = new CubicPath(ParkSidePoints);

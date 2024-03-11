@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,14 +20,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
-import org.firstinspires.ftc.teamcode.utility.CameraShenanigans;
 import org.firstinspires.ftc.teamcode.vision.HSVDetectElement;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.List;
 
 
 @Config
-@Autonomous(name="aplsitngade", group="Linear Opmode")
+@Autonomous(name="Red Right Simple", group="Linear Opmode")
 public class AprilTagTest extends LinearOpMode {
 
     //Initialize FTCDashboard
@@ -34,9 +36,7 @@ public class AprilTagTest extends LinearOpMode {
 
     double taskNumber = 0, targetHeading = 180;
     private double nanoTime = 0, hz = 0, count = 0;
-    private boolean depositScoring = false, followTangent = true, cameraOn = false;
-
-    double[] relevantValues;
+    private boolean depositScoring = false, followTangent = true;
 
     double temp = 0;
 
@@ -48,16 +48,19 @@ public class AprilTagTest extends LinearOpMode {
     apexStates apexstate = apexStates.SPIKE;
     Pose2d pose = new Pose2d(-45,-60,90 / (180 / Math.PI));
 
+    VisionProcessor processor;
+    VisionPortal portal;
+
     ElapsedTime goofytimer = new ElapsedTime();
     ElapsedTime swingTimer = new ElapsedTime();
-
-
-
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("Waiting for start");
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        processor = new HSVDetectElement();
+        portal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), processor);
 
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, true);
 
@@ -65,13 +68,11 @@ public class AprilTagTest extends LinearOpMode {
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
+
         //Initialize FTCDashboard
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        CameraShenanigans camera = new CameraShenanigans(telemetry, hardwareMap, dashboard);
-        camera.enableAprilTag(false);
-        camera.enableHSVDetection(true);
 
         //Create objects for the classes we use
         GVF gvf = new GVF(dashboard, RedPathList.RightPathToSpike, 4, 15, 0.5, telemetry);
@@ -87,16 +88,11 @@ public class AprilTagTest extends LinearOpMode {
             sleep(20);
             if (HSVDetectElement.returnDetected() == HSVDetectElement.State.LEFT && taskNumber == 0) {
                 gvf.setPath(RedPathList.RightPathToLeftSpike, 4, 15, 0.5);
-                relevantValues = camera.tag4Values;
             }
             else if (HSVDetectElement.returnDetected() == HSVDetectElement.State.RIGHT && taskNumber == 0) {
                 gvf.setPath(RedPathList.RightPathToRightSpike, 4, 15, 0.5);
-                relevantValues = camera.tag6Values;
             }
-            else {
-                gvf.setPath(RedPathList.RightPathToSpike, 4, 15, 0.5);
-                relevantValues = camera.tag5Values;
-            }
+            else gvf.setPath(RedPathList.RightPathToSpike, 4, 15, 0.5);
             intake.setCanopeePosition(intake.CANOPEE_DOWN);
         }
 
@@ -106,25 +102,19 @@ public class AprilTagTest extends LinearOpMode {
         goofytimer.reset();
         drive.resetIMU();
         intake.setIntakePower(0);
+        portal.close();
         taskNumber = 0;
-        camera.enableHSVDetection(false);
         deposit.toggleLatch(true);
 
 
         while (opModeIsActive()) {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
-            camera.update();
-
 
             Vector2d gvfOut = gvf.output(new Vector2d(pose.getX(), pose.getY()));
-            camera.telemetryAprilTag();
-            telemetry.addData("values",new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
-            telemetry.addData("out",gvfOut);
             drive.drive(gvfOut.getX(), gvfOut.getY(), gvf.headingOut(drive.getHeadingInDegrees(),targetHeading, followTangent, false));
 
             switch(apexstate){
-
                 case SPIKE:
                     if (detected == HSVDetectElement.State.LEFT) targetHeading = 90;
                     else if (detected == HSVDetectElement.State.RIGHT) targetHeading = -90;
@@ -132,34 +122,27 @@ public class AprilTagTest extends LinearOpMode {
                     if (gvf.isDone(5, 5) && taskNumber == 0 && goofytimer.seconds() > 3) {
                         //intake.setIntakePower(-0.5);
                         intake.setCanopeePosition(intake.CANOPEE_UP);
-
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 1) {
                         intake.off();
                         gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
-                        camera.enableAprilTag(true);
                         apexstate = apexStates.CYCLE;
                     }
                     break;
 
                 case CYCLE:
-                    if (taskNumber == 0 && gvf.isDone(5, 7) && goofytimer.seconds() > 0.25) {
-                        if (camera.seen()) {
-                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),-36 + camera.tag5Values[0]));
-                        }
+                    if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
-                        followTangent = false;
                         goofytimer.reset();
-                        camera.enableAprilTag(false);
                         if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(RedPathList.BoardAdjustmentRight, 4, 15, 0.5);
                         else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(RedPathList.BoardAdjustmentLeft, 4, 15, 0.5);
                         else gvf.setPath(RedPathList.BoardAdjustment, 4, 15, 0.5);
                     }
-                    if (taskNumber == 1 && gvf.isDone(5,10) && goofytimer.seconds() > 0.25) {
+                    if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
                         depositScoring = true;
@@ -170,7 +153,6 @@ public class AprilTagTest extends LinearOpMode {
                     if (taskNumber == 2 && goofytimer.seconds() > 2) {
                         depositScoring = false;
                         targetHeading = 0;
-                        followTangent = false;
                         gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
@@ -188,14 +170,13 @@ public class AprilTagTest extends LinearOpMode {
                 deposit.setEndPosition(deposit.END_IN);
                 temp = 1;
                 if (swingTimer.seconds() > 0.2) {
-                    if (deposit.currentState() == VerticalSlide.in  && deposit.isSlideDone()) {
+                    if (/*intake.currentState() == HorizontalSlide.in && */deposit.currentState() == VerticalSlide.in /*&& intake.isSlideDone()*/ && deposit.isSlideDone()) {
                         deposit.setSwingPosition(deposit.SWING_TRANSFER);
                         temp = 2;
                     }
                     else deposit.setSwingPosition(deposit.SWING_WAIT);
                 }
             }
-
 
             pose = drive.getPose();
             TelemetryPacket packet = new TelemetryPacket();
@@ -204,8 +185,9 @@ public class AprilTagTest extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
             telemetry.addData("pose",pose);
             double nano = System.nanoTime();
-            hz = (1000000000 / (nano - nanoTime));
-            telemetry.addData("hz", hz);
+            hz += (1000000000 / (nano - nanoTime));
+            count++;
+            telemetry.addData("hz", hz / count);
             nanoTime = nano;
             telemetry.addData("temp",temp);
             telemetry.addData("isdone",gvf.isDone(10, 10));
