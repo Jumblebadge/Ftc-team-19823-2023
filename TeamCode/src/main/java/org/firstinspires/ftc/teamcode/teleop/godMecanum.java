@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -15,14 +14,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
-import org.firstinspires.ftc.teamcode.subsystems.HorizontalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.VerticalSlide;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 
@@ -46,6 +44,7 @@ public class godMecanum extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(telemetry, hardwareMap, false);
         Deposit deposit = new Deposit(hardwareMap);
         Intake intake = new Intake(hardwareMap);
+        Plane plane = new Plane(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -107,6 +106,12 @@ public class godMecanum extends LinearOpMode {
                 heading = -90;
                 headingPIDtoggle.toTrue();
             }
+
+            if (gamepad1.left_bumper && gamepad1.right_bumper) {
+                plane.shoot();
+            }
+            else plane.hold();
+
 
 
             if (gamepad1.b) {
@@ -170,10 +175,11 @@ public class godMecanum extends LinearOpMode {
             if (rumble.risingEdge(gamepad2.triangle)) {
                 if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
             }
-
             intake.update();
 
-            if (slideModeToggle.toggle(gamepad2.right_stick_button)) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
+            if (slideModeToggle.toggle(gamepad1.options)) {
+                if (deposit.getPosition() < 1500) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
+            }
             else deposit.update();
 
             double nano = System.nanoTime();
@@ -183,8 +189,9 @@ public class godMecanum extends LinearOpMode {
             nanoTime = nano;
 
             telemetry.addData("slide", deposit.getPosition());
-            telemetry.addData("test",test.seconds());
+            telemetry.addData("test",gamepad2.options);
             telemetry.addData("pise",drive.getPose().toString());
+            telemetry.addData("slide", deposit.getPosition());
             telemetry.update();
         }
     }

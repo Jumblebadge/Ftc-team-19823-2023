@@ -9,16 +9,16 @@ import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 public class Plane {
 
     private final ServoImplExW plane;
-    public final double hold = 0.5, release = 0.5;
+    public final double HOLD = 0.5, SHOOT = 0.5;
 
     public Plane(HardwareMap hardwareMap){
         plane = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "plane"));
         plane.setPwmRange(new PwmControl.PwmRange(500, 2500));
     }
 
-    public void hold(){ plane.setPosition(hold); }
+    public void hold(){ plane.setPosition(HOLD); }
 
-    public void release(){ plane.setPosition(release); }
+    public void shoot(){ plane.setPosition(SHOOT); }
 
     public void moveTo(double target) {
         plane.setPosition(target);
@@ -27,7 +27,7 @@ public class Plane {
     public void PWMrelease() { plane.setPwmDisable(); }
 
     public void toggle(boolean active) {
-        if (active) { release(); }
+        if (active) { shoot(); }
         else { hold(); }
     }
 
