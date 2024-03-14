@@ -64,7 +64,7 @@ public class godMecanum extends LinearOpMode {
         ButtonDetector rumble = new ButtonDetector();
 
         ElapsedTime swingTimer = new ElapsedTime();
-        ElapsedTimeW test = new ElapsedTimeW();
+        ElapsedTimeW latchTimer = new ElapsedTimeW();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
@@ -144,10 +144,10 @@ public class godMecanum extends LinearOpMode {
             if (gamepad2.dpad_up) {
                 intake.out();
             }
+
             intakePower = gamepad2.left_trigger/1.5;
-            if (intakeReverse.toggle(gamepad2.left_bumper)) {
-                intakePower *= -1;
-            }
+            if (intakeReverse.toggle(gamepad2.left_bumper)) intakePower *= -1;
+            //check if intake moves from in
             intake.setIntakePower(intakePower);
 
             if (depositMovement.toggle(gamepad2.right_bumper)) {
@@ -168,9 +168,8 @@ public class godMecanum extends LinearOpMode {
             telemetry.addData("deposit", deposit.isSlideDone());
             telemetry.addData("game",-gamepad1.left_stick_x);
 
-            //intake.toggleLatch(intakeLatch.toggle(gamepad2.back));
             intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
-            deposit.toggleLatch(depositLatch.toggle(gamepad2.triangle));
+            deposit.toggleLatch(depositLatch.risingEdge(gamepad2.triangle));
 
             if (rumble.risingEdge(gamepad2.triangle)) {
                 if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
@@ -180,7 +179,7 @@ public class godMecanum extends LinearOpMode {
             if (slideModeToggle.toggle(gamepad1.options)) {
                 if (deposit.getPosition() < 1500) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
             }
-            else deposit.update();
+            else deposit.update(depositMovement.toggle(gamepad2.right_bumper));
 
             double nano = System.nanoTime();
             hz = (1000000000 / (nano - nanoTime));

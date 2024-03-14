@@ -75,7 +75,7 @@ public class HorizontalSlide {
     }
 
     public void addOffset(double offset) {
-        this.offset = offset;
+        HorizontalSlide.offset = offset;
     }
 
     public void in(){

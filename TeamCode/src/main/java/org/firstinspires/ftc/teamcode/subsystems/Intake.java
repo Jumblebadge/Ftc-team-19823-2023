@@ -52,8 +52,10 @@ public class Intake {
 
     public void update() {
         slide.update();
-        if (slide.returnState() != HorizontalSlide.in) latch.setPosition(LATCH_CLOSED);
-        else if (isSlideDone() && slide.returnState() == HorizontalSlide.in) latch.setPosition(LATCH_OPEN);
+        if (slide.returnState() == HorizontalSlide.in && Deposit.isTransfer) {
+            latch.setPosition(LATCH_OPEN);
+        }
+        else latch.setPosition(LATCH_CLOSED);
     }
 
     public void setLatchPosition(double target) { latch.setPosition(target); }
@@ -78,7 +80,10 @@ public class Intake {
         else latch.setPosition(LATCH_CLOSED);
     }
 
-    public void setIntakePower(double power) { intake.setPower(power); }
+    public void setIntakePower(double power) {
+        //TODO make this not work if switching from in to somewhere else
+        intake.setPower(power);
+    }
 
     public void in() { slide.in(); }
 
