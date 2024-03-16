@@ -15,17 +15,17 @@ import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
 @Config
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-
-    public static boolean endIn = true;
-    public static double dTime = 1;
-    double count = 0;
+    public static double number = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -36,7 +36,8 @@ public class testing extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
         Deposit deposit = new Deposit(hardwareMap);
-        ButtonDetector depositLatch = new ButtonDetector();
+
+        ElapsedTimeW timer = new ElapsedTimeW();
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -45,25 +46,14 @@ public class testing extends LinearOpMode {
         //PhotonCore.enable();
 
         //Initialize FTCDashboard telemetry
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        Gamepad current = new Gamepad();
-        Gamepad previous = new Gamepad();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
 
         waitForStart();
         while (opModeIsActive()) {
-            previous.copy(current);
-            current.copy(gamepad2);
-            controlHub.clearBulkCache();
 
-
-            deposit.toggleLatch(current.x && !previous.x, dTime);
-            if (depositLatch.risingEdge(gamepad2.x)) count++;
-            deposit.update(endIn);
-            deposit.in();
-            telemetry.addData("sllide",count);
-            telemetry.addData("someghind",current.x && !previous.x);
+            deposit.setEndPosition(number);
+            deposit.update(false);
             telemetry.addData("another",gamepad2.x);
             telemetry.update();
         }

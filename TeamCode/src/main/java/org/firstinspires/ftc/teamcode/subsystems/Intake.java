@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 
 public class Intake {
@@ -18,8 +19,10 @@ public class Intake {
     private final double intakePower = 1;
     HorizontalSlide slide;
     ServoImplExW latch, canopee;
-    public final double LATCH_OPEN = 0.3, LATCH_CLOSED = 0.45;
+    public final double LATCH_OPEN = 0.35, LATCH_CLOSED = 0.45;
     public final double CANOPEE_DOWN = 0.425, CANOPEE_UP = 0.775;
+    private double last = HorizontalSlide.in;
+    private ElapsedTimeW rollerTimer = new ElapsedTimeW();
 
     //canopee 0 down, 0.4 up, 0.? 5stack
     //latch 0.3 open, 0.45 closed
@@ -81,8 +84,18 @@ public class Intake {
     }
 
     public void setIntakePower(double power) {
-        //TODO make this not work if switching from in to somewhere else
-        intake.setPower(power);
+        if (last == HorizontalSlide.in && currentState() != HorizontalSlide.in) {
+            rollerTimer.reset();
+            last = currentState();
+        }
+        if (rollerTimer.seconds() > 0.25) {
+            intake.setPower(power);
+            last = currentState();
+        }
+        else {
+            intake.setPower(0);
+            last = currentState();
+        }
     }
 
     public void in() { slide.in(); }

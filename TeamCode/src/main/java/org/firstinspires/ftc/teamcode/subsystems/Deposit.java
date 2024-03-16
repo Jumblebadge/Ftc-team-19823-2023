@@ -22,8 +22,8 @@ public class Deposit {
     private final ElapsedTimeW latchTime = new ElapsedTimeW();
     private final VerticalSlide slide;
     public final double LATCH_CLOSED = 1, LATCH_OPEN = 0;
-    public final double END_IN = 1, END_OUT = 0.2;
-    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.165, SWING_WAIT = 0.25;
+    public final double END_IN = 0.9, END_OUT = 0.1;
+    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.1875, SWING_WAIT = 0.25;
     public final double SECONDARY_SWING_OUT = 0.775, SECONDARY_END_OUT = 0.255;
     public static boolean isTransfer = true;
 
@@ -93,7 +93,7 @@ public class Deposit {
             latch.setPosition(LATCH_OPEN);
             latchTime.reset();
         }
-        else if (latchTime.seconds() > 1){
+        else if (latchTime.seconds() > 0.135){
             latch.setPosition(LATCH_CLOSED);
         }
     }
@@ -123,7 +123,7 @@ public class Deposit {
 
     public void update(boolean endIn) {
         slide.update();
-        isTransfer = slide.returnState() == VerticalSlide.in && endIn;
+        isTransfer = slide.returnState() == VerticalSlide.in && !endIn;
     }
 
     public double currentState() { return slide.returnState(); }

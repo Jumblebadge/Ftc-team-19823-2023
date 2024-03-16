@@ -7,8 +7,6 @@ public class ElapsedTimeW extends ElapsedTime {
     private volatile long nsPausedTime = nsNow();
     private volatile boolean isPaused = false;
 
-    //TODO find out if this works
-
     public long nanoseconds() {
         if (isPaused){
             return nsPausedTime - nsStartTime;

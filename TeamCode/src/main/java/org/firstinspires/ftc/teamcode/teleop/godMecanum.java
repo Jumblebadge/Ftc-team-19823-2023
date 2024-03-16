@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -50,21 +51,18 @@ public class godMecanum extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
-        ButtonDetector setHeadingTarget = new ButtonDetector();
-        ButtonDetector headingTo270 = new ButtonDetector();
-        ButtonDetector headingTo180 = new ButtonDetector();
-        ButtonDetector headingTo90 = new ButtonDetector();
-        ButtonDetector headingTo0 = new ButtonDetector();
         ButtonDetector intakeReverse = new ButtonDetector();
         ButtonDetector depositMovement = new ButtonDetector();
-        ButtonDetector depositLatch = new ButtonDetector();
         ButtonDetector canopeeToggle = new ButtonDetector();
         ButtonDetector slideModeToggle = new ButtonDetector();
 
-        ButtonDetector rumble = new ButtonDetector();
+        ElapsedTimeW swingTimer = new ElapsedTimeW();
 
-        ElapsedTime swingTimer = new ElapsedTime();
-        ElapsedTimeW latchTimer = new ElapsedTimeW();
+        Gamepad current1 = new Gamepad();
+        Gamepad previous1 = new Gamepad();
+
+        Gamepad current2 = new Gamepad();
+        Gamepad previous2 = new Gamepad();
 
         PIDcontroller headingPID = new PIDcontroller(0.14,0.001,0,1.25,0.1);
 
@@ -76,9 +74,13 @@ public class godMecanum extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            previous1.copy(current1);
+            current1.copy(gamepad1);
+            previous2.copy(current2);
+            current2.copy(gamepad2);
 
             //Clear the cache for better loop times (bulk sensor reads)
-            for (LynxModule hub : allHubs) { hub.clearBulkCache(); }
+            for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             //driving gamepad
             if (headingPIDtoggle.toggle(gamepad1.a)) {
@@ -86,28 +88,29 @@ public class godMecanum extends LinearOpMode {
             }
             else { rotation = 0; }
 
-            if (setHeadingTarget.risingEdge(gamepad1.x)) {
+            if (current1.x && !previous1.x) {
                 heading = drive.getHeading();
             }
 
-            if (headingTo0.risingEdge(gamepad1.dpad_up)) {
+            if (current1.dpad_up && !previous1.dpad_up) {
                 heading = 0;
                 headingPIDtoggle.toTrue();
             }
-            if (headingTo90.risingEdge(gamepad1.dpad_right)) {
+            if (current1.dpad_right && !previous1.dpad_right) {
                 heading = 90;
                 headingPIDtoggle.toTrue();
             }
-            if (headingTo180.risingEdge(gamepad1.dpad_down)) {
+            if (current1.dpad_down && !previous1.dpad_down) {
                 heading = 180;
                 headingPIDtoggle.toTrue();
             }
-            if (headingTo270.risingEdge(gamepad1.dpad_left)) {
+            if (current1.dpad_left && !previous1.dpad_left) {
                 heading = -90;
                 headingPIDtoggle.toTrue();
             }
 
             if (gamepad1.left_bumper && gamepad1.right_bumper) {
+                telemetry.addData("shot?","ye");
                 plane.shoot();
             }
             else plane.hold();
@@ -147,7 +150,6 @@ public class godMecanum extends LinearOpMode {
 
             intakePower = gamepad2.left_trigger/1.5;
             if (intakeReverse.toggle(gamepad2.left_bumper)) intakePower *= -1;
-            //check if intake moves from in
             intake.setIntakePower(intakePower);
 
             if (depositMovement.toggle(gamepad2.right_bumper)) {
@@ -168,10 +170,10 @@ public class godMecanum extends LinearOpMode {
             telemetry.addData("deposit", deposit.isSlideDone());
             telemetry.addData("game",-gamepad1.left_stick_x);
 
-            intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
-            deposit.toggleLatch(depositLatch.risingEdge(gamepad2.triangle));
+            //intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
+            deposit.toggleLatch(current2.triangle && !previous2.triangle);
 
-            if (rumble.risingEdge(gamepad2.triangle)) {
+            if (current2.triangle && !previous2.triangle) {
                 if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
             }
             intake.update();
@@ -189,6 +191,7 @@ public class godMecanum extends LinearOpMode {
 
             telemetry.addData("slide", deposit.getPosition());
             telemetry.addData("test",gamepad2.options);
+            telemetry.addData("isTransfer",Deposit.isTransfer);
             telemetry.addData("pise",drive.getPose().toString());
             telemetry.addData("slide", deposit.getPosition());
             telemetry.update();
