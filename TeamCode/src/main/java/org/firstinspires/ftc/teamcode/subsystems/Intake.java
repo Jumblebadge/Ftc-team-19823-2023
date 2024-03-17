@@ -20,7 +20,7 @@ public class Intake {
     HorizontalSlide slide;
     ServoImplExW latch, canopee;
     public final double LATCH_OPEN = 0.35, LATCH_CLOSED = 0.45;
-    public final double CANOPEE_DOWN = 0.425, CANOPEE_UP = 0.775;
+    public final double CANOPEE_DOWN = 0.4, CANOPEE_UP = 0.575;
     private double last = HorizontalSlide.in;
     private ElapsedTimeW rollerTimer = new ElapsedTimeW();
 
@@ -36,9 +36,9 @@ public class Intake {
         latch.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         canopee = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "canopee"));
-        canopee.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         slide = new HorizontalSlide(hardwareMap);
+        slide.resetEncoders();
     }
 
     public void on(){
@@ -64,6 +64,8 @@ public class Intake {
     public void setLatchPosition(double target) { latch.setPosition(target); }
 
     public void setCanopeePosition(double target) { canopee.setPosition(target); }
+
+    public double getCanopeePosition() { return canopee.getPosition(); }
 
     public void toggleCanopee(boolean active) {
         if (active) canopee.setPosition(CANOPEE_DOWN);

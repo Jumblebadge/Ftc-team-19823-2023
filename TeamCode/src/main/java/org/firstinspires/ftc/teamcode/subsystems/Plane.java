@@ -20,6 +20,8 @@ public class Plane {
 
     public void shoot(){ plane.setPosition(SHOOT); }
 
+    public void setPosition(double position) { plane.setPosition(position); }
+
     public void moveTo(double target) {
         plane.setPosition(target);
     }

@@ -19,13 +19,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.CameraShenanigans;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
 @Config
 @TeleOp(name="testing", group="Linear Opmode")
 public class testing extends LinearOpMode {
 
-    public static double number = 0.5;
+    public static double number = 0.5, number1 = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -35,7 +36,8 @@ public class testing extends LinearOpMode {
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
-        Deposit deposit = new Deposit(hardwareMap);
+        CameraShenanigans camera = new CameraShenanigans(telemetry, hardwareMap, dashboard);
+        Plane plane = new Plane(hardwareMap);
 
         ElapsedTimeW timer = new ElapsedTimeW();
 
@@ -48,12 +50,15 @@ public class testing extends LinearOpMode {
         //Initialize FTCDashboard telemetry
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-
+        camera.enableAprilTag(true);
+        camera.enableHSVDetection(false);
         waitForStart();
         while (opModeIsActive()) {
-
-            deposit.setEndPosition(number);
-            deposit.update(false);
+            plane.setPosition(number);
+            camera.update();
+            telemetry.addData("camera",camera.tag5Values);
+            camera.telemetryAprilTag();
+            telemetry.addData("pose", new Pose2d(36 + (18 - camera.tag5Values[1]),36 - camera.tag5Values[0]));
             telemetry.addData("another",gamepad2.x);
             telemetry.update();
         }

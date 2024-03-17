@@ -17,7 +17,7 @@ public class HorizontalSlide {
     private final TouchSensor touch;
     private final RunMotionProfile profile = new RunMotionProfile(60000,70000,80000,0.1,0,1,0.2, 1);
 
-    public static final double in = -100, mid1 = 200, mid2 = 400, out = 600;
+    public static final double in = 0, mid1 = 200, mid2 = 400, out = 600;
     public static double currentState = in, offset = 0;
 
     // 0-1100

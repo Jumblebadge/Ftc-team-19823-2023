@@ -103,7 +103,7 @@ public class BlueRightSimpleParkSide extends LinearOpMode {
         intake.setIntakePower(0);
         camera.enableHSVDetection(false);
         taskNumber = 0;
-        deposit.toggleLatch(true);
+        deposit.setLatch(deposit.LATCH_CLOSED);
 
 
         while (opModeIsActive()) {
@@ -126,9 +126,9 @@ public class BlueRightSimpleParkSide extends LinearOpMode {
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 0.75) {
                         intake.off();
-                        gvf.setPath(BluePathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
+                        gvf.setPath(BluePathList.LeftSpikeToBoard, 3.5, 30, 0.5);
                         taskNumber = 0;
                         targetHeading = -90;
                         camera.enableAprilTag(true);
@@ -137,32 +137,43 @@ public class BlueRightSimpleParkSide extends LinearOpMode {
                     break;
 
                 case CYCLE:
-                    if (taskNumber == 0 && gvf.isDone(10, 10) && goofytimer.seconds() > 0.25) {
-                        if (camera.seen()) {
-                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),36 - camera.tag5Values[0]));
-                        }
+                    if (taskNumber == 0 && gvf.isDone(5, 7) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
+                        followTangent = false;
                         goofytimer.reset();
-                        camera.enableAprilTag(false);
+                    }
+                    if (taskNumber == 1 && gvf.isDone(5, 7)) {
+                        if (camera.seen()) {
+                            drive.setPoseEstimate(new Pose2d(36 + (18 - camera.tag5Values[1]),36 + camera.tag5Values[0]));
+                        }
+                    }
+                    if (taskNumber == 1 && gvf.isDone(5, 7) && goofytimer.seconds() > 1) {
                         if (detected == HSVDetectElement.State.RIGHT) gvf.setPath(BluePathList.BoardAdjustmentLeft, 4, 15, 0.5);
                         else if (detected == HSVDetectElement.State.LEFT) gvf.setPath(BluePathList.BoardAdjustmentRight, 4, 15, 0.5);
                         else gvf.setPath(BluePathList.BoardAdjustment, 4, 15, 0.5);
+                        camera.enableAprilTag(false);
+                        taskNumber++;
+                        goofytimer.reset();
                     }
-                    if (taskNumber == 1 && gvf.isDone(5, 10) && goofytimer.seconds() > 0.25) {
+                    if (taskNumber == 2 && gvf.isDone(5,10) && goofytimer.seconds() > 0.25) {
                         taskNumber++;
                         goofytimer.reset();
                         depositScoring = true;
                     }
-                    if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        deposit.toggleLatch(false);
+                    if (taskNumber == 3 && goofytimer.seconds() > 1) {
+                        deposit.setLatch(deposit.LATCH_OPEN);
+                        taskNumber++;
+                        goofytimer.reset();
                     }
-                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
+                    if (taskNumber == 4 && goofytimer.seconds() > 1) {
                         depositScoring = false;
-                        targetHeading = 0;
-                        followTangent = false;
-                        gvf.setPath(BluePathList.ParkSide, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
+                    }
+                    if (taskNumber == 5 && goofytimer.seconds() > 0.75) {
+                        gvf.setPath(BluePathList.ParkSide, 4, 7, 0.5);
+                        targetHeading = 0;
+                        followTangent = false;
                     }
                     break;
             }

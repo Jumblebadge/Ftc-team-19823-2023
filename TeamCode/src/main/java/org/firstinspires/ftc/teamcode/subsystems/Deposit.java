@@ -22,9 +22,9 @@ public class Deposit {
     private final ElapsedTimeW latchTime = new ElapsedTimeW();
     private final VerticalSlide slide;
     public final double LATCH_CLOSED = 1, LATCH_OPEN = 0;
-    public final double END_IN = 0.9, END_OUT = 0.1;
-    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.1875, SWING_WAIT = 0.25;
-    public final double SECONDARY_SWING_OUT = 0.775, SECONDARY_END_OUT = 0.255;
+    public final double END_IN = 0.9, END_OUT = 0.05;
+    public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.2, SWING_WAIT = 0.25;
+    public final double SECONDARY_SWING_OUT = 0.75, SECONDARY_END_OUT = 0.115;
     public static boolean isTransfer = true;
 
     public Deposit(HardwareMap hardwareMap) {
@@ -44,6 +44,7 @@ public class Deposit {
         swing = new DualServo(swingL, swingR);
         //end = new EncoderServo(endServo, endEncoder);
         slide = new VerticalSlide(hardwareMap);
+        slide.resetEncoders();
     }
 
     public boolean isSlideDone() { return slide.isTimeDone() || slide.isPositionDone(); }
@@ -87,27 +88,25 @@ public class Deposit {
         setLatch(0.4);
     }
 
-    public void toggleLatch(boolean open) {
-        if (isTransfer) latch.setPosition(LATCH_OPEN);
-        else if (open) {
-            latch.setPosition(LATCH_OPEN);
-            latchTime.reset();
-        }
-        else if (latchTime.seconds() > 0.135){
-            latch.setPosition(LATCH_CLOSED);
+
+    public void toggleLatch(boolean toggle, boolean button) {
+        if (toggle) latch.setPosition(LATCH_OPEN);
+        else {
+            if (button) {
+                latchTime.reset();
+                latch.setPosition(LATCH_OPEN);
+            }
+            else if (latchTime.seconds() > 0.135){
+                latch.setPosition(LATCH_CLOSED);
+            }
         }
     }
 
-    public void toggleLatch(boolean open, double time) {
-        if (isTransfer) latch.setPosition(LATCH_OPEN);
-        else if (open) {
-            latch.setPosition(LATCH_OPEN);
-            latchTime.reset();
-        }
-        else if (latchTime.seconds() > time){
-            latch.setPosition(LATCH_CLOSED);
-        }
+    public void toggleLatch(boolean open) {
+        if (open) latch.setPosition(LATCH_OPEN);
+        else latch.setPosition(LATCH_CLOSED);
     }
+
 
     public double latchPosition() {
         return latch.getPosition();

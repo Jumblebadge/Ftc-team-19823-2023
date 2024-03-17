@@ -106,8 +106,7 @@ public class RedRightSimpleParkSide extends LinearOpMode {
         intake.setIntakePower(0);
         taskNumber = 0;
         camera.enableHSVDetection(false);
-        deposit.toggleLatch(true);
-
+        deposit.setLatch(deposit.LATCH_CLOSED);
 
         while (opModeIsActive()) {
             //Clear the cache for better loop times (bulk sensor reads)
@@ -133,8 +132,8 @@ public class RedRightSimpleParkSide extends LinearOpMode {
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
-                        intake.off();
+                    if (taskNumber == 1 && goofytimer.seconds() > 0.75) {
+                        //
                         gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
@@ -162,15 +161,21 @@ public class RedRightSimpleParkSide extends LinearOpMode {
                         depositScoring = true;
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        deposit.toggleLatch(false);
-                    }
-                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
-                        depositScoring = false;
-                        targetHeading = 0;
-                        followTangent = false;
-                        gvf.setPath(RedPathList.ParkSide, 4, 7, 0.5);
+                        deposit.setLatch(deposit.LATCH_OPEN);
                         goofytimer.reset();
                         taskNumber++;
+                    }
+                    if (taskNumber == 3 && goofytimer.seconds() > 1) {
+                        //
+                        depositScoring = false;
+                        goofytimer.reset();
+                        taskNumber++;
+                    }
+                    if (taskNumber == 4 && goofytimer.seconds() > 0.75) {
+                        //
+                        gvf.setPath(RedPathList.ParkSide, 4, 7, 0.5);
+                        targetHeading = 0;
+                        followTangent = false;
                     }
                     break;
             }

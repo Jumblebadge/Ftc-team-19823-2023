@@ -108,8 +108,7 @@ public class RedRightSimpleParkMid extends LinearOpMode {
         intake.setIntakePower(0);
         taskNumber = 0;
         camera.enableHSVDetection(false);
-        deposit.toggleLatch(true);
-
+        deposit.setLatch(deposit.LATCH_CLOSED);
 
         while (opModeIsActive()) {
             //Clear the cache for better loop times (bulk sensor reads)
@@ -137,12 +136,12 @@ public class RedRightSimpleParkMid extends LinearOpMode {
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 4) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 0.75) {
                         intake.off();
-                        gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 10, 0.5);
+                        gvf.setPath(RedPathList.RightSpikeToBoard, 3.5, 22.5, 0.5);
                         taskNumber = 0;
                         targetHeading = 90;
-                        //camera.enableAprilTag(true);
+                        camera.enableAprilTag(true);
                         apexstate = apexStates.CYCLE;
                     }
                     break;
@@ -166,15 +165,19 @@ public class RedRightSimpleParkMid extends LinearOpMode {
                         depositScoring = true;
                     }
                     if (taskNumber == 2 && goofytimer.seconds() > 1) {
-                        deposit.toggleLatch(false);
+                        deposit.setLatch(deposit.LATCH_OPEN);
+                        taskNumber++;
+                        goofytimer.reset();
                     }
-                    if (taskNumber == 2 && goofytimer.seconds() > 2) {
+                    if (taskNumber == 3 && goofytimer.seconds() > 1) {
                         depositScoring = false;
-                        targetHeading = 0;
-                        followTangent = false;
-                        gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
                         goofytimer.reset();
                         taskNumber++;
+                    }
+                    if (taskNumber == 4 && goofytimer.seconds() > 0.75) {
+                        gvf.setPath(RedPathList.ParkMid, 4, 7, 0.5);
+                        targetHeading = 0;
+                        followTangent = false;
                     }
                     break;
             }

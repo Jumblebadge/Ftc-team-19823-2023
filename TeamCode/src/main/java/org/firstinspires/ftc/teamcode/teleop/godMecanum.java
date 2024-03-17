@@ -10,7 +10,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
@@ -55,6 +54,7 @@ public class godMecanum extends LinearOpMode {
         ButtonDetector depositMovement = new ButtonDetector();
         ButtonDetector canopeeToggle = new ButtonDetector();
         ButtonDetector slideModeToggle = new ButtonDetector();
+        ButtonDetector testToggle = new ButtonDetector();
 
         ElapsedTimeW swingTimer = new ElapsedTimeW();
 
@@ -68,9 +68,6 @@ public class godMecanum extends LinearOpMode {
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
-        
-        deposit.resetEncoders();
-        intake.resetEncoders();
 
         waitForStart();
         while (opModeIsActive()) {
@@ -110,11 +107,9 @@ public class godMecanum extends LinearOpMode {
             }
 
             if (gamepad1.left_bumper && gamepad1.right_bumper) {
-                telemetry.addData("shot?","ye");
                 plane.shoot();
             }
             else plane.hold();
-
 
 
             if (gamepad1.b) {
@@ -170,16 +165,16 @@ public class godMecanum extends LinearOpMode {
             telemetry.addData("deposit", deposit.isSlideDone());
             telemetry.addData("game",-gamepad1.left_stick_x);
 
-            //intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
-            deposit.toggleLatch(current2.triangle && !previous2.triangle);
+            intake.toggleCanopee(canopeeToggle.toggle(gamepad2.left_stick_button));
+            deposit.toggleLatch(testToggle.toggle(current2.triangle), current2.right_trigger > 0.1 && !(previous2.right_trigger > 0.1));
 
             if (current2.triangle && !previous2.triangle) {
                 if (deposit.latchPosition() > 0.5)  gamepad2.rumble(100);
             }
             intake.update();
 
-            if (slideModeToggle.toggle(gamepad1.options)) {
-                if (deposit.getPosition() < 1500) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
+            if (slideModeToggle.toggle(gamepad2.options && gamepad2.back)) {
+                if (deposit.getPosition() < 3000) deposit.disabledPIDsetPower(-gamepad2.right_stick_y);
             }
             else deposit.update(depositMovement.toggle(gamepad2.right_bumper));
 
@@ -190,13 +185,14 @@ public class godMecanum extends LinearOpMode {
             nanoTime = nano;
 
             telemetry.addData("slide", deposit.getPosition());
-            telemetry.addData("test",gamepad2.options);
+            telemetry.addData("test",intake.getCanopeePosition());
             telemetry.addData("isTransfer",Deposit.isTransfer);
             telemetry.addData("pise",drive.getPose().toString());
             telemetry.addData("slide", deposit.getPosition());
             telemetry.update();
         }
     }
+
     public static void drawRobot(Canvas canvas, Pose2d pose) {
         canvas.strokeCircle(pose.getX(), pose.getY(), 9);
         Vector2d v = pose.headingVec().times(9);
