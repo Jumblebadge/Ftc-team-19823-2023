@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 public class Plane {
 
     private final ServoImplExW plane;
-    public final double HOLD = 0.5, SHOOT = 0.5;
+    public final double HOLD = 0.4, SHOOT = 1;
 
     public Plane(HardwareMap hardwareMap){
         plane = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "plane"));

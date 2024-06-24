@@ -126,7 +126,7 @@ public class RedLeftSimpleParkMid extends LinearOpMode {
                         taskNumber++;
                         goofytimer.reset();
                     }
-                    if (taskNumber == 1 && goofytimer.seconds() > 0.75) {
+                    if (taskNumber == 1 && goofytimer.seconds() > 10) {
                         intake.off();
                         gvf.setPath(RedPathList.LeftSpikeToBoard, 4, 30, 0.5);
                         taskNumber = 0;

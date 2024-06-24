@@ -111,7 +111,7 @@ public class BluePathList {
             new Vector2d(-36,39),
             new Vector2d(-36,37),
             new Vector2d(-36,37),
-            new Vector2d(-36,33.5)
+            new Vector2d(-36,32.5)
     };
     public static final CubicPath RightPathToSpike = new CubicPath(RightPathToSpikePoints);
 
@@ -185,7 +185,7 @@ public class BluePathList {
             new Vector2d(41.6,36.0),
             new Vector2d(45.0,36.0),
             new Vector2d(47.4,35.8),
-            new Vector2d(50,36.0),
+            new Vector2d(49.5,36.0),
     };
     public static final CubicPath BoardAdjustment = new CubicPath(BoardAdjustmentPoints);
 
@@ -197,7 +197,7 @@ public class BluePathList {
             new Vector2d(41.6,36.0),
             new Vector2d(44.7,36.6),
             new Vector2d(49.6,40.0),
-            new Vector2d(50,46.0),
+            new Vector2d(49.5,46.0),
     };
     public static final CubicPath BoardAdjustmentRight = new CubicPath(BoardAdjustmentRightPoints);
 
@@ -209,7 +209,7 @@ public class BluePathList {
             new Vector2d(41.6,36.0),
             new Vector2d(44.7,35.5),
             new Vector2d(50.0,31.7),
-            new Vector2d(50,26.5),
+            new Vector2d(49.5,26.5),
     };
     public static final CubicPath BoardAdjustmentLeft = new CubicPath(BoardAdjustmentLeftPoints);
 

@@ -24,6 +24,7 @@ public class Deposit {
     public final double LATCH_CLOSED = 1, LATCH_OPEN = 0;
     public final double END_IN = 0.9, END_OUT = 0.05;
     public final double SWING_OUT = 0.7, SWING_TRANSFER = 0.2, SWING_WAIT = 0.25;
+    //old out 0.7
     public final double SECONDARY_SWING_OUT = 0.75, SECONDARY_END_OUT = 0.115;
     public static boolean isTransfer = true;
 
